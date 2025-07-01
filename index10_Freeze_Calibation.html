@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>butPlug_AutoX Web Synthesizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: linear-gradient(135deg, #0a0a1a, #1a0a1a); color: #fff; font-family: 'Courier New', monospace; }
+        canvas { position: absolute; top: 0; left: 0; z-index: -1; opacity: 0.6; }
+        .glitch { animation: glitch 0.3s linear infinite; }
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translate(-5px, 5px); }
+            20%, 40%, 60%, 80% { transform: translate(5px, -5px); }
+        }
+        .control-panel {
+            background: rgba(10, 10, 10, 0.3);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 0, 100, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            animation: panel-glow 1.5s ease-in-out infinite;
+        }
+        @keyframes panel-glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 0, 100, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(100, 0, 255, 0.5); }
+        }
+        .tooltip { position: relative; }
+        .tooltip:hover::after {
+            content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+            background: #000; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 12px; z-index: 10;
+        }
+        .canvas-pulse { animation: pulse 0.8s infinite; }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 10px 5px rgba(255, 0, 100, 0.4); }
+            50% { box-shadow: 0 0 20px 10px rgba(100, 0, 255, 0.6); }
+            100% { box-shadow: 0 0 10px 5px rgba(255, 0, 100, 0.4); }
+        }
+        .slider-container { position: relative; }
+        .slider-container input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #000;
+            border: 1px solid #ff0066;
+            border-radius: 3px;
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 0, 100, 0.5), 0 0 15px rgba(100, 0, 255, 0.3);
+            animation: slider-flicker 0.2s linear infinite;
+        }
+        @keyframes slider-flicker {
+            0%, 100% { border-color: #ff0066; }
+            50% { border-color: #6600ff; }
+        }
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #ff0066;
+            border-radius: 50%;
+            filter: url(#glitch-filter);
+            box-shadow: 0 0 15px #ff0066, 0 0 25px #6600ff;
+            animation: thumb-glitch 0.4s linear infinite;
+            cursor: pointer;
+        }
+        @keyframes thumb-glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+            60% { transform: translate(-1px, 1px); }
+            80% { transform: translate(1px, -1px); }
+        }
+        .slider-particles { position: absolute; top: 0; left: 0; pointer-events: none; }
+        .glitch-button {
+            position: relative;
+            background: #000;
+            border: 2px solid #ff0066;
+            border-radius: 5px;
+            padding: 8px 16px;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            filter: url(#glitch-filter);
+            animation: button-flicker 0.3s linear infinite;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        @keyframes button-flicker {
+            0%, 100% { border-color: #ff0066; box-shadow: 0 0 10px #ff0066; }
+            50% { border-color: #6600ff; box-shadow: 0 0 15px #6600ff; }
+        }
+        .glitch-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 0, 100, 0.7);
+        }
+        .glitch-button:active {
+            transform: scale(0.95);
+            filter: url(#glitch-filter-intense);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+    <svg style="position: absolute; width: 0; height: 0;">
+        <filter id="glitch-filter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.1" numOctaves="1" result="noise"/>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+        <filter id="glitch-filter-intense">
+            <feTurbulence type="fractalNoise" baseFrequency="0.15" numOctaves="1" result="noise"/>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="12" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+    </svg>
+    <canvas id="visuals" class="w-full h-full"></canvas>
+    <div class="control-panel w-full max-w-4xl">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Oscillator Controls -->
+            <div class="space-y-4">
+                <h2 class="text-xl glitch">Oscillator</h2>
+                <div class="slider-container tooltip" data-tooltip="Base frequency (20-4000 Hz)">
+                    <label class="block text-sm">Frequency</label>
+                    <input type="range" id="freq" min="20" max="4000" value="440" class="w-full">
+                    <canvas class="slider-particles" width="100" height="20"></canvas>
+                </div>
+                <div class="slider-container tooltip" data-tooltip="Modulation depth (0-2000 Hz)">
+                    <label class="block text-sm">Mod Depth</label>
+                    <input type="range" id="modDepth" min="0" max="2000" step="1" value="500" class="w-full">
+                    <canvas class="slider-particles" width="100" height="20"></canvas>
+                </div>
+            </div>
+            <!-- LFO Controls -->
+            <div class="space-y-4">
+                <h2 class="text-xl glitch">LFO</h2>
+                <div class="slider-container tooltip" data-tooltip="LFO rate (0-50 Hz)">
+                    <label class="block text-sm">LFO Rate</label>
+                    <input type="range" id="lfoRate" min="0" max="50" value="5" class="w-full">
+                    <canvas class="slider-particles" width="100" height="20"></canvas>
+                </div>
+                <div class="slider-container tooltip" data-tooltip="LFO amplitude (0-2)">
+                    <label class="block text-sm">LFO Amp</label>
+                    <input type="range" id="lfoAmp" min="0" max="2" step="0.01" value="0.5" class="w-full">
+                    <canvas class="slider-particles" width="100" height="20"></canvas>
+                </div>
+                <div class="slider-container tooltip" data-tooltip="Sensor sensitivity (0.5x-2x)">
+                    <label class="block text-sm">Sensor Sensitivity: <span id="sensorSensitivityValue">1</span>x</label>
+                    <input type="range" id="sensorSensitivity" min="0.5" max="2" step="0.1" value="1" class="w-full">
+                    <canvas class="slider-particles" width="100" height="20"></canvas>
+                </div>
+            </div>
+            <!-- Effects Controls -->
+            <div class="space-y-4">
+                <h2 class="text-xl glitch">Effects</h2>
+                <div class="slider-container tooltip" data-tooltip="Low-pass filter cutoff (20-20000 Hz)">
+                    <label class="block text-sm">Filter Cutoff</label>
+                    <input type="range" id="filterCutoff" min="20" max="20000" value="1000" class="w-full">
+                    <canvas class="slider-particles" width="100" height="20"></canvas>
+                </div>
+                <div class="slider-container tooltip" data-tooltip="Distortion amount (0-2)">
+                    <label class="block text-sm">Distortion</label>
+                    <input type="range" id="distortion" min="0" max="2" step="0.01" value="0.2" class="w-full">
+                    <canvas class="slider-particles" width="100" height="20"></canvas>
+                </div>
+                <div class="slider-container tooltip" data-tooltip="Randomization interval (20ms-5s)">
+                    <label class="block text-sm">Random Interval: <span id="randomIntervalValue">2000ms</span></label>
+                    <input type="range" id="randomInterval" min="0.02" max="5" step="0.01" value="2" class="w-full">
+                    <canvas class="slider-particles" width="100" height="20"></canvas>
+                </div>
+                <div class="slider-container tooltip" data-tooltip="Freeze trigger threshold (0-20 m/s²)">
+                    <label class="block text-sm">Freeze Threshold: <span id="freezeThresholdValue">18</span> m/s²</label>
+                    <input type="range" id="freezeThreshold" min="0" max="20" step="0.1" value="18" class="w-full">
+                    <canvas class="slider-particles" width="100" height="20"></canvas>
+                </div>
+                <div class="slider-container tooltip" data-tooltip="Reverb feedback (0-0.95)">
+                    <label class="block text-sm">Reverb Feedback: <span id="reverbFeedbackValue">0.5</span></label>
+                    <input type="range" id="reverbFeedback" min="0" max="0.95" step="0.01" value="0.5" class="w-full">
+                    <canvas class="slider-particles" width="100" height="20"></canvas>
+                </div>
+                <div class="slider-container tooltip" data-tooltip="Reverb size (0.5-5s)">
+                    <label class="block text-sm">Reverb Size: <span id="reverbSizeValue">2</span>s</label>
+                    <input type="range" id="reverbSize" min="0.5" max="5" step="0.1" value="2" class="w-full">
+                    <canvas class="slider-particles" width="100" height="20"></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- Button Controls -->
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button id="oscToggle" class="glitch-button">Start Osc</button>
+            <button id="lfoToggle" class="glitch-button">Start LFO</button>
+            <button id="sensorToggle" class="glitch-button">Enable Sensors</button>
+            <button id="calibrateToggle" class="glitch-button">Calibrate Sensors</button>
+            <button id="freezeToggle" class="glitch-button">Freeze Effect</button>
+            <button id="freezeModeToggle" class="glitch-button">Freeze: Shake Mode</button>
+            <button id="randomizeToggle" class="glitch-button">Randomize Every <span id="randomToggleText">2s</span></button>
+            <button id="reverbToggle" class="glitch-button">Enable Reverb</button>
+            <button id="reverbRandomToggle" class="glitch-button">Include Reverb in Random</button>
+            <button id="recordToggle" class="glitch-button">Start Recording</button>
+        </div>
+    </div>
+    <div class="mt-4 text-sm">
+        MIDI: <span id="midiStatus">Not connected</span> | 
+        Sensors: <span id="sensorStatus">Not active (Hold steady and click 'Calibrate Sensors')</span> | 
+        Recording: <span id="recordStatus">Not recording</span>
+    </div>
+
+    <script>
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        let osc, lfo, modGain, lfoAmpGain, filter, distortion, freezeSource, output, analyser, reverb, reverbGain, dryGain;
+        let isOscPlaying = false, isLfoActive = false, isFreezeActive = false, isRandomizing = false, isSensorActive = false, isReverbActive = false, isReverbRandomized = true, isRecording = false, isFreezeShakeMode = true;
+        let smoothedRandom = 0, freezeBuffer = null, randomizeInterval, lastRandomizeTime = 0, recorder, recordStartTime = 0;
+        let calibrationData = { x: 0, y: 0 }, isCalibrating = false, lastFreezeTrigger = 0;
+
+        // Initialize audio nodes
+        function initAudio() {
+            osc = ctx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(440, ctx.currentTime);
+
+            lfo = ctx.createOscillator();
+            lfo.type = 'triangle';
+            lfo.frequency.setValueAtTime(5, ctx.currentTime);
+
+            modGain = ctx.createGain();
+            modGain.gain.setValueAtTime(500, ctx.currentTime);
+
+            lfoAmpGain = ctx.createGain();
+            lfoAmpGain.gain.setValueAtTime(0.5, ctx.currentTime);
+
+            filter = ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(1000, ctx.currentTime);
+
+            distortion = ctx.createWaveShaper();
+            distortion.curve = makeDistortionCurve(0.2);
+
+            analyser = ctx.createAnalyser();
+            analyser.fftSize = 2048;
+
+            reverb = ctx.createConvolver();
+            reverb.buffer = generateReverbImpulse(2);
+
+            reverbGain = ctx.createGain();
+            reverbGain.gain.setValueAtTime(0.5, ctx.currentTime);
+
+            dryGain = ctx.createGain();
+            dryGain.gain.setValueAtTime(0.5, ctx.currentTime);
+
+            output = ctx.createGain();
+            output.gain.setValueAtTime(0.95, ctx.currentTime);
+
+            // Signal routing
+            lfo.connect(modGain);
+            modGain.connect(osc.frequency);
+            lfo.connect(lfoAmpGain);
+            lfoAmpGain.connect(output.gain);
+            osc.connect(distortion);
+            distortion.connect(filter);
+            filter.connect(analyser);
+            analyser.connect(dryGain);
+            analyser.connect(reverb);
+            reverb.connect(reverbGain);
+            dryGain.connect(output);
+            reverbGain.connect(output);
+            output.connect(ctx.destination);
+
+            // Initialize recorder
+            const stream = ctx.createMediaStreamDestination();
+            output.connect(stream);
+            recorder = new MediaRecorder(stream.stream, { mimeType: 'audio/webm' });
+            const chunks = [];
+            recorder.ondataavailable = e => chunks.push(e.data);
+            recorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'audio/wav' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `butPlug_AutoX_recording_${new Date().toISOString().replace(/[:.]/g, '-')}.wav`;
+                a.click();
+                URL.revokeObjectURL(url);
+                chunks.length = 0;
+            };
+        }
+
+        // Generate synthetic reverb impulse
+        function generateReverbImpulse(size) {
+            const sampleRate = ctx.sampleRate;
+            const length = sampleRate * size;
+            const impulse = ctx.createBuffer(2, length, sampleRate);
+            const left = impulse.getChannelData(0);
+            const right = impulse.getChannelData(1);
+            for (let i = 0; i < length; i++) {
+                const decay = Math.exp(-i / (sampleRate * size) * 8);
+                left[i] = (Math.random() * 2 - 1) * decay;
+                right[i] = (Math.random() * 2 - 1) * decay;
+            }
+            return impulse;
+        }
+
+        // Distortion curve for tanh~
+        function makeDistortionCurve(amount) {
+            const samples = 44100;
+            const curve = new Float32Array(samples);
+            for (let i = 0; i < samples; i++) {
+                const x = (i * 2) / samples - 1;
+                curve[i] = Math.tanh(x * (1 + amount * 10));
+            }
+            return curve;
+        }
+
+        // Approximate else/lfnoise
+        function startSmoothedRandom() {
+            setInterval(() => {
+                const target = Math.random() * 2 - 1;
+                const smoothing = 0.05;
+                smoothedRandom = smoothedRandom + (target - smoothedRandom) * smoothing;
+                if (isLfoActive) {
+                    lfoAmpGain.gain.setValueAtTime(smoothedRandom * document.getElementById('lfoAmp').value, ctx.currentTime);
+                }
+            }, 100);
+        }
+
+        // Freeze effect
+        function toggleFreeze() {
+            isFreezeActive = !isFreezeActive;
+            if (isFreezeActive) {
+                const bufferSize = analyser.fftSize;
+                const buffer = new Float32Array(bufferSize);
+                analyser.getFloatTimeDomainData(buffer);
+                freezeBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                freezeBuffer.copyToChannel(buffer, 0);
+                freezeSource = ctx.createBufferSource();
+                freezeSource.buffer = freezeBuffer;
+                freezeSource.loop = true;
+                freezeSource.connect(output);
+                freezeSource.start();
+                osc.disconnect();
+            } else {
+                if (freezeSource) {
+                    freezeSource.stop();
+                    freezeSource.disconnect();
+                    freezeSource = null;
+                    freezeBuffer = null;
+                }
+                osc.connect(distortion);
+            }
+            document.getElementById('freezeToggle').textContent = isFreezeActive ? 'Unfreeze' : 'Freeze Effect';
+        }
+
+        // Toggle reverb
+        function toggleReverb() {
+            isReverbActive = !isReverbActive;
+            reverbGain.gain.setValueAtTime(isReverbActive ? document.getElementById('reverbFeedback').value : 0, ctx.currentTime);
+            dryGain.gain.setValueAtTime(isReverbActive ? (1 - document.getElementById('reverbFeedback').value) : 1, ctx.currentTime);
+            document.getElementById('reverbToggle').textContent = isReverbActive ? 'Disable Reverb' : 'Enable Reverb';
+        }
+
+        // Toggle reverb randomization
+        function toggleReverbRandom() {
+            isReverbRandomized = !isReverbRandomized;
+            document.getElementById('reverbRandomToggle').textContent = isReverbRandomized ? 'Exclude Reverb from Random' : 'Include Reverb in Random';
+        }
+
+        // Toggle freeze trigger mode
+        function toggleFreezeMode() {
+            isFreezeShakeMode = !isFreezeShakeMode;
+            document.getElementById('freezeModeToggle').textContent = isFreezeShakeMode ? 'Freeze: Tilt Mode' : 'Freeze: Shake Mode';
+            document.getElementById('sensorStatus').textContent = isSensorActive 
+                ? `Active (Calibrated, ${isFreezeShakeMode ? 'Shake' : 'Tilt'} Mode)` 
+                : `Supported (Calibrated, ${isFreezeShakeMode ? 'Shake' : 'Tilt'} Mode)`;
+        }
+
+        // Toggle recording
+        function toggleRecording() {
+            if (!isRecording) {
+                if (!isOscPlaying) {
+                    alert('Start the oscillator first to record audio.');
+                    return;
+                }
+                recorder.start();
+                isRecording = true;
+                recordStartTime = performance.now();
+                document.getElementById('recordToggle').textContent = 'Stop Recording';
+                document.getElementById('recordStatus').textContent = 'Recording... 0s';
+                const updateTime = setInterval(() => {
+                    if (!isRecording) {
+                        clearInterval(updateTime);
+                        return;
+                    }
+                    const elapsed = (performance.now() - recordStartTime) / 1000;
+                    document.getElementById('recordStatus').textContent = `Recording... ${elapsed.toFixed(1)}s`;
+                    if (elapsed >= 300) { // 5-minute limit
+                        toggleRecording();
+                    }
+                }, 100);
+            } else {
+                recorder.stop();
+                isRecording = false;
+                document.getElementById('recordToggle').textContent = 'Start Recording';
+                document.getElementById('recordStatus').textContent = 'Not recording';
+            }
+        }
+
+        // Randomize parameters with debouncing
+        function randomizeParams() {
+            const now = performance.now();
+            if (now - lastRandomizeTime < 20) return; // Debounce to avoid overloading
+            document.getElementById('freq').value = 20 + Math.random() * 3980;
+            document.getElementById('modDepth').value = Math.random() * 2000;
+            document.getElementById('lfoRate').value = Math.random() * 50;
+            document.getElementById('lfoAmp').value = Math.random() * 2;
+            document.getElementById('filterCutoff').value = 20 + Math.random() * 19980;
+            document.getElementById('distortion').value = Math.random() * 2;
+            if (isReverbRandomized) {
+                document.getElementById('reverbFeedback').value = Math.random() * 0.95;
+                document.getElementById('reverbSize').value = 0.5 + Math.random() * 4.5;
+            }
+            updateParams();
+            lastRandomizeTime = now;
+        }
+
+        // Toggle randomization with variable interval
+        function toggleRandomize() {
+            isRandomizing = !isRandomizing;
+            const interval = parseFloat(document.getElementById('randomInterval').value);
+            document.getElementById('randomizeToggle').textContent = isRandomizing ? 'Stop Randomize' : `Randomize Every ${interval < 1 ? (interval * 1000).toFixed(0) + 'ms' : interval.toFixed(1) + 's'}`;
+            if (isRandomizing) {
+                randomizeInterval = setInterval(randomizeParams, interval * 1000);
+            } else {
+                clearInterval(randomizeInterval);
+            }
+        }
+
+        // Update audio parameters
+        function updateParams() {
+            osc.frequency.setValueAtTime(document.getElementById('freq').value, ctx.currentTime);
+            modGain.gain.setValueAtTime(document.getElementById('modDepth').value, ctx.currentTime);
+            lfo.frequency.setValueAtTime(document.getElementById('lfoRate').value, ctx.currentTime);
+            lfoAmpGain.gain.setValueAtTime(document.getElementById('lfoAmp').value, ctx.currentTime);
+            filter.frequency.setValueAtTime(document.getElementById('filterCutoff').value, ctx.currentTime);
+            distortion.curve = makeDistortionCurve(parseFloat(document.getElementById('distortion').value));
+            reverbGain.gain.setValueAtTime(isReverbActive ? document.getElementById('reverbFeedback').value : 0, ctx.currentTime);
+            dryGain.gain.setValueAtTime(isReverbActive ? (1 - document.getElementById('reverbFeedback').value) : 1, ctx.currentTime);
+            const size = parseFloat(document.getElementById('reverbSize').value);
+            reverb.buffer = generateReverbImpulse(size);
+        }
+
+        // MIDI handling
+        function initMIDI() {
+            if (navigator.requestMIDIAccess) {
+                navigator.requestMIDIAccess().then(
+                    (midi) => {
+                        document.getElementById('midiStatus').textContent = 'Connected';
+                        midi.inputs.forEach(input => {
+                            input.onmidimessage = (msg) => {
+                                if (msg.data[0] === 176) { // Control Change
+                                    const cc = msg.data[1];
+                                    const value = msg.data[2];
+                                    if (cc === 18) document.getElementById('freq').value = 20 + (value / 127) * 3980;
+                                    if (cc === 22) document.getElementById('modDepth').value = (value / 127) * 2000;
+                                    if (cc === 26) document.getElementById('lfoRate').value = (value / 127) * 50;
+                                    if (cc === 30) document.getElementById('lfoAmp').value = (value / 127) * 2;
+                                    if (cc === 16) document.getElementById('filterCutoff').value = 20 + (value / 127) * 19980;
+                                    if (cc === 20) document.getElementById('distortion').value = (value / 127) * 2;
+                                    if (cc === 24) document.getElementById('reverbFeedback').value = (value / 127) * 0.95;
+                                    if (cc === 28) document.getElementById('reverbSize').value = 0.5 + (value / 127) * 4.5;
+                                    updateParams();
+                                }
+                            };
+                        });
+                    },
+                    () => { document.getElementById('midiStatus').textContent = 'Failed to connect'; }
+                );
+            } else {
+                document.getElementById('midiStatus').textContent = 'Web MIDI not supported';
+            }
+        }
+
+        // DeviceMotion handling with calibration and freeze trigger
+        function initSensors() {
+            if (window.DeviceMotionEvent) {
+                window.addEventListener('devicemotion', (event) => {
+                    if (isSensorActive) {
+                        const accel = event.accelerationIncludingGravity;
+                        if (accel.x !== null && accel.y !== null && accel.z !== null) {
+                            const sensitivity = parseFloat(document.getElementById('sensorSensitivity').value);
+                            // Calibrated LFO rate and amplitude
+                            const lfoRate = Math.max(0, Math.min(50, ((accel.x - calibrationData.x) / 10) * 50 * sensitivity));
+                            const lfoAmp = Math.max(0, Math.min(2, ((accel.y - calibrationData.y) / 10) * 2 * sensitivity));
+                            document.getElementById('lfoRate').value = lfoRate;
+                            document.getElementById('lfoAmp').value = lfoAmp;
+                            updateParams();
+                            // Freeze trigger
+                            const threshold = parseFloat(document.getElementById('freezeThreshold').value);
+                            const now = performance.now();
+                            if (isFreezeShakeMode) {
+                                // Shake mode: High threshold
+                                if (Math.abs(accel.z) > threshold && now - lastFreezeTrigger > 1000) {
+                                    toggleFreeze();
+                                    lastFreezeTrigger = now;
+                                }
+                            } else {
+                                // Tilt mode: Negative z-axis (e.g., flip upside-down)
+                                if (accel.z < -8 && now - lastFreezeTrigger > 1000) {
+                                    toggleFreeze();
+                                    lastFreezeTrigger = now;
+                                }
+                            }
+                        }
+                    }
+                    if (isCalibrating) {
+                        calibrationData.x = event.accelerationIncludingGravity.x || 0;
+                        calibrationData.y = event.accelerationIncludingGravity.y || 0;
+                        isCalibrating = false;
+                        document.getElementById('calibrateToggle').textContent = 'Calibrate Sensors';
+                        document.getElementById('sensorStatus').textContent = isSensorActive 
+                            ? `Active (Calibrated, ${isFreezeShakeMode ? 'Shake' : 'Tilt'} Mode)` 
+                            : `Supported (Calibrated, ${isFreezeShakeMode ? 'Shake' : 'Tilt'} Mode)`;
+                    }
+                });
+                document.getElementById('sensorStatus').textContent = `Supported (Hold steady and click 'Calibrate Sensors')`;
+            } else {
+                document.getElementById('sensorStatus').textContent = 'Not supported';
+                document.getElementById('sensorToggle').disabled = true;
+                document.getElementById('calibrateToggle').disabled = true;
+                document.getElementById('freezeModeToggle').disabled = true;
+            }
+        }
+
+        // Canvas visuals with particle collisions
+        const canvas = document.getElementById('visuals');
+        const c = canvas.getContext('2d');
+        let particles = [];
+
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: 5 + Math.random() * 20,
+                    vx: Math.random() * 2 - 1,
+                    vy: Math.random() * 2 - 1,
+                    baseColor: `hsl(${Math.random() * 60 + 300}, 70%, 50%)`, // Darker red/purple hues
+                    trail: [],
+                    collisionTime: 0
+                });
+            }
+            animateCanvas();
+        }
+
+        function animateCanvas() {
+            c.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            c.fillRect(0, 0, canvas.width, canvas.height);
+            if (isRandomizing) {
+                canvas.classList.add('canvas-pulse');
+                canvas.style.animationDuration = `${Math.max(0.5, document.getElementById('randomInterval').value)}s`;
+            } else {
+                canvas.classList.remove('canvas-pulse');
+            }
+
+            // Particle collisions
+            particles.forEach((p1, i) => {
+                particles.forEach((p2, j) => {
+                    if (i >= j) return;
+                    const dx = p2.x - p1.x;
+                    const dy = p2.y - p1.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const minDist = p1.radius + p2.radius + 50;
+                    if (dist < minDist) {
+                        const angle = Math.atan2(dy, dx);
+                        const force = (minDist - dist) * 0.05 * (1 + document.getElementById('lfoAmp').value);
+                        p1.vx -= Math.cos(angle) * force;
+                        p1.vy -= Math.sin(angle) * force;
+                        p2.vx += Math.cos(angle) * force;
+                        p2.vy += Math.sin(angle) * force;
+                        p1.collisionTime = performance.now();
+                        p2.collisionTime = performance.now();
+                    }
+                });
+            });
+
+            particles.forEach(p => {
+                p.x += p.vx * (isFreezeActive ? 0.2 : 1);
+                p.y += p.vy * (isFreezeActive ? 0.2 : 1);
+                if (p.x < p.radius || p.x > canvas.width - p.radius) p.vx *= -1;
+                if (p.y < p.radius || p.y > canvas.height - p.radius) p.vy *= -1;
+                p.trail.push({ x: p.x, y: p.y });
+                if (p.trail.length > 10) p.trail.shift();
+                const now = performance.now();
+                const pulse = isRandomizing && (now - lastRandomizeTime < 200) ? 1.5 : 1;
+                const collisionPulse = (now - p.collisionTime < 200) ? 1.5 : 1;
+                c.beginPath();
+                c.arc(p.x, p.y, p.radius * pulse * collisionPulse * (1 + document.getElementById('lfoAmp').value / 2), 0, Math.PI * 2);
+                c.fillStyle = isFreezeActive ? `hsl(200, 70%, ${50 + collisionPulse * 20}%)` : `hsl(${parseFloat(p.baseColor.match(/\d+/)[0])}, 70%, ${50 + collisionPulse * 20}%)`;
+                c.fill();
+                c.beginPath();
+                c.moveTo(p.trail[0]?.x || p.x, p.trail[0]?.y || p.y);
+                p.trail.forEach((t, i) => {
+                    c.lineTo(t.x, t.y);
+                    c.strokeStyle = `rgba(255, 100, 100, ${i / p.trail.length * collisionPulse * 0.5})`; // Darker red trails
+                    c.stroke();
+                });
+            });
+            requestAnimationFrame(animateCanvas);
+        }
+
+        // Slider particle effects
+        const sliderCanvases = document.querySelectorAll('.slider-particles');
+        sliderCanvases.forEach(canvas => {
+            const ctx = canvas.getContext('2d');
+            let sliderParticles = [];
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = 20;
+
+            function initSliderParticles() {
+                sliderParticles = [];
+                for (let i = 0; i < 8; i++) {
+                    sliderParticles.push({
+                        x: 0,
+                        y: canvas.height / 2,
+                        vx: (Math.random() - 0.5) * 3,
+                        vy: (Math.random() - 0.5) * 3,
+                        radius: 1 + Math.random() * 2,
+                        life: 0,
+                        maxLife: 20
+                    });
+                }
+            }
+
+            function animateSliderParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const input = canvas.previousElementSibling;
+                const value = (input.value - input.min) / (input.max - input.min);
+                const thumbX = value * (canvas.width - 16) + 8;
+                sliderParticles.forEach((p, i) => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life++;
+                    if (p.life > p.maxLife) {
+                        sliderParticles.splice(i, 1);
+                        sliderParticles.push({
+                            x: thumbX,
+                            y: canvas.height / 2,
+                            vx: (Math.random() - 0.5) * 3,
+                            vy: (Math.random() - 0.5) * 3,
+                            radius: 1 + Math.random() * 2,
+                            life: 0,
+                            maxLife: 20
+                        });
+                    }
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 0, 100, ${1 - p.life / p.maxLife})`; // Dark red smoky particles
+                    ctx.fill();
+                });
+                requestAnimationFrame(animateSliderParticles);
+            }
+
+            canvas.parentElement.querySelector('input').addEventListener('input', () => {
+                initSliderParticles();
+            });
+            initSliderParticles();
+            animateSliderParticles();
+        });
+
+        // Button particle effects
+        const buttons = document.querySelectorAll('.glitch-button');
+        buttons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const rect = button.getBoundingClientRect();
+                const x = rect.left + rect.width / 2;
+                const y = rect.top + rect.height / 2;
+                for (let i = 0; i < 15; i++) {
+                    particles.push({
+                        x: x,
+                        y: y,
+                        radius: 2 + Math.random() * 4,
+                        vx: (Math.random() - 0.5) * 5,
+                        vy: (Math.random() - 0.5) * 5,
+                        baseColor: `hsl(${Math.random() * 60 + 300}, 70%, 50%)`, // Darker red/purple
+                        trail: [],
+                        collisionTime: performance.now()
+                    });
+                }
+            });
+        });
+
+        // Event listeners
+        document.getElementById('oscToggle').addEventListener('click', () => {
+            if (!isOscPlaying) {
+                ctx.resume().then(() => {
+                    osc.start();
+                    lfo.start();
+                    isOscPlaying = true;
+                    document.getElementById('oscToggle').textContent = 'Stop Osc';
+                });
+            } else {
+                osc.stop();
+                lfo.stop();
+                if (freezeSource) {
+                    freezeSource.stop();
+                    freezeSource.disconnect();
+                    freezeSource = null;
+                    freezeBuffer = null;
+                }
+                isOscPlaying = false;
+                document.getElementById('oscToggle').textContent = 'Start Osc';
+                initAudio();
+                updateParams();
+            }
+        });
+
+        document.getElementById('lfoToggle').addEventListener('click', () => {
+            isLfoActive = !isLfoActive;
+            lfo.frequency.setValueAtTime(isLfoActive ? document.getElementById('lfoRate').value : 0, ctx.currentTime);
+            document.getElementById('lfoToggle').textContent = isLfoActive ? 'Stop LFO' : 'Start LFO';
+        });
+
+        document.getElementById('freezeToggle').addEventListener('click', toggleFreeze);
+
+        document.getElementById('freezeModeToggle').addEventListener('click', toggleFreezeMode);
+
+        document.getElementById('reverbToggle').addEventListener('click', toggleReverb);
+
+        document.getElementById('reverbRandomToggle').addEventListener('click', toggleReverbRandom);
+
+        document.getElementById('recordToggle').addEventListener('click', toggleRecording);
+
+        document.getElementById('sensorToggle').addEventListener('click', () => {
+            isSensorActive = !isSensorActive;
+            document.getElementById('sensorToggle').textContent = isSensorActive ? 'Disable Sensors' : 'Enable Sensors';
+            document.getElementById('sensorStatus').textContent = isSensorActive 
+                ? `Active (Calibrated, ${isFreezeShakeMode ? 'Shake' : 'Tilt'} Mode)` 
+                : `Supported (Hold steady and click 'Calibrate Sensors', ${isFreezeShakeMode ? 'Shake' : 'Tilt'} Mode)`;
+            if (!isSensorActive) calibrationData = { x: 0, y: 0 }; // Reset calibration
+        });
+
+        document.getElementById('calibrateToggle').addEventListener('click', () => {
+            if (isSensorActive) {
+                isCalibrating = true;
+                document.getElementById('calibrateToggle').textContent = 'Calibrating...';
+            }
+        });
+
+        document.getElementById('randomizeToggle').addEventListener('click', toggleRandomize);
+
+        document.getElementById('randomInterval').addEventListener('input', () => {
+            const interval = parseFloat(document.getElementById('randomInterval').value);
+            document.getElementById('randomIntervalValue').textContent = interval < 1 ? (interval * 1000).toFixed(0) + 'ms' : interval.toFixed(1) + 's';
+            document.getElementById('randomToggleText').textContent = interval < 1 ? (interval * 1000).toFixed(0) + 'ms' : interval.toFixed(1) + 's';
+            if (isRandomizing) {
+                clearInterval(randomizeInterval);
+                randomizeInterval = setInterval(randomizeParams, interval * 1000);
+            }
+        });
+
+        document.getElementById('sensorSensitivity').addEventListener('input', () => {
+            const sensitivity = parseFloat(document.getElementById('sensorSensitivity').value);
+            document.getElementById('sensorSensitivityValue').textContent = sensitivity.toFixed(1);
+        });
+
+        document.getElementById('freezeThreshold').addEventListener('input', () => {
+            const threshold = parseFloat(document.getElementById('freezeThreshold').value);
+            document.getElementById('freezeThresholdValue').textContent = threshold.toFixed(1);
+        });
+
+        document.getElementById('reverbFeedback').addEventListener('input', () => {
+            const feedback = parseFloat(document.getElementById('reverbFeedback').value);
+            document.getElementById('reverbFeedbackValue').textContent = feedback.toFixed(2);
+            updateParams();
+        });
+
+        document.getElementById('reverbSize').addEventListener('input', () => {
+            const size = parseFloat(document.getElementById('reverbSize').value);
+            document.getElementById('reverbSizeValue').textContent = size.toFixed(1);
+            updateParams();
+        });
+
+        document.getElementById('freq').addEventListener('input', updateParams);
+        document.getElementById('modDepth').addEventListener('input', updateParams);
+        document.getElementById('lfoRate').addEventListener('input', updateParams);
+        document.getElementById('lfoAmp').addEventListener('input', updateParams);
+        document.getElementById('filterCutoff').addEventListener('input', updateParams);
+        document.getElementById('distortion').addEventListener('input', updateParams);
+
+        // Initialize
+        initAudio();
+        initMIDI();
+        initSensors();
+        initCanvas();
+        startSmoothedRandom();
+    </script>
+</body>
+</html>
