@@ -287,6 +287,31 @@
         <div class="mt-4 flex justify-center">
             <button id="recordToggle" class="glitch-button bold-button bold-button-flicker">Start Recording</button>
         </div>
+        <!-- MIDI Controls -->
+        <div class="mt-4 flex justify-center gap-4">
+            <select id="midiOutputSelect" class="glitch-button" style="padding: 8px; width: 200px;">
+                <option value="" disabled selected>Select MIDI Output Port</option>
+            </select>
+            <select id="midiChannelSelect" class="glitch-button" style="padding: 8px; width: 150px;">
+                <option value="0" disabled selected>Select MIDI Channel</option>
+                <option value="0">Channel 1</option>
+                <option value="1">Channel 2</option>
+                <option value="2">Channel 3</option>
+                <option value="3">Channel 4</option>
+                <option value="4">Channel 5</option>
+                <option value="5">Channel 6</option>
+                <option value="6">Channel 7</option>
+                <option value="7">Channel 8</option>
+                <option value="8">Channel 9</option>
+                <option value="9">Channel 10</option>
+                <option value="10">Channel 11</option>
+                <option value="11">Channel 12</option>
+                <option value="12">Channel 13</option>
+                <option value="13">Channel 14</option>
+                <option value="14">Channel 15</option>
+                <option value="15">Channel 16</option>
+            </select>
+        </div>
     </div>
     <div class="mt-4 text-base font-bold" style="text-shadow: 0 0 5px rgba(255, 0, 100, 0.5);">
         MIDI: <span id="midiStatus">Not connected</span> | 
@@ -346,6 +371,11 @@
             <li><strong>Sensors Status:</strong> Shows sensor activity and mode.</li>
             <li><strong>Recording Status:</strong> Indicates recording state and duration.</li>
         </ul>
+        <p><strong>MIDI Controllers:</strong></p>
+        <ul>
+            <li><strong>MIDI Output:</strong> Select the output port to send MIDI messages from the dropdown menu.</li>
+            <li><strong>MIDI Channel:</strong> Choose the MIDI channel (1-16) for all outgoing messages from the dropdown menu.</li>
+        </ul>
         <p><strong>Notes:</strong> Requires HTTPS for sensors and modern browsers (Chrome/Safari) for MIDI and recording. Use MIDI CC 18-30 for parameter control.</p>
     </div>
 
@@ -355,6 +385,7 @@
         let isOscPlaying = false, isLfoActive = false, isFreezeActive = false, isRandomizing = false, isSensorActive = false, isReverbActive = false, isReverbRandomized = true, isRecording = false, isFreezeShakeMode = true, isFreezeSensorActive = true;
         let smoothedRandom = 0, freezeBuffer = null, randomizeInterval, lastRandomizeTime = 0, recorder, recordStartTime = 0;
         let calibrationData = { x: 0, y: 0 }, isCalibrating = false, lastFreezeTrigger = 0;
+        let midiOutput = null, midiChannel = 0; // Added for MIDI output port and channel
 
         // Initialize audio nodes
         function initAudio() {
@@ -597,14 +628,30 @@
             dryGain.gain.setValueAtTime(isReverbActive ? (1 - document.getElementById('reverbFeedback').value) : 1, ctx.currentTime);
             const size = parseFloat(document.getElementById('reverbSize').value);
             reverb.buffer = generateReverbImpulse(size);
+            sendMidiMessage(); // Send MIDI messages with current parameters
         }
 
-        // MIDI handling
+        // MIDI handling with output and channel
         function initMIDI() {
             if (navigator.requestMIDIAccess) {
                 navigator.requestMIDIAccess().then(
                     (midi) => {
                         document.getElementById('midiStatus').textContent = 'Connected';
+                        const outputSelect = document.getElementById('midiOutputSelect');
+                        midi.outputs.forEach(output => {
+                            const option = document.createElement('option');
+                            option.value = output.id;
+                            option.textContent = output.name;
+                            outputSelect.appendChild(option);
+                        });
+                        outputSelect.addEventListener('change', () => {
+                            midiOutput = midi.outputs.get(outputSelect.value) || null;
+                            document.getElementById('midiStatus').textContent = midiOutput ? 'Connected (Output selected)' : 'Connected (No output)';
+                        });
+                        document.getElementById('midiChannelSelect').addEventListener('change', (e) => {
+                            midiChannel = parseInt(e.target.value);
+                            document.getElementById('midiStatus').textContent = `Connected (Channel ${midiChannel + 1}, Output ${midiOutput ? 'selected' : 'none'})`;
+                        });
                         midi.inputs.forEach(input => {
                             input.onmidimessage = (msg) => {
                                 if (msg.data[0] === 176) { // Control Change
@@ -627,6 +674,28 @@
                 );
             } else {
                 document.getElementById('midiStatus').textContent = 'Web MIDI not supported';
+            }
+        }
+
+        // Send MIDI message
+        function sendMidiMessage() {
+            if (midiOutput) {
+                const status = 0xB0 + midiChannel; // Control Change status for the selected channel
+                const params = [
+                    { id: 'freq', cc: 18, min: 20, max: 4000 },
+                    { id: 'modDepth', cc: 22, min: 0, max: 2000 },
+                    { id: 'filterCutoff', cc: 16, min: 20, max: 20000 },
+                    { id: 'lfoRate', cc: 26, min: 0, max: 50 },
+                    { id: 'lfoAmp', cc: 30, min: 0, max: 2 },
+                    { id: 'distortion', cc: 20, min: 0, max: 2 },
+                    { id: 'reverbFeedback', cc: 24, min: 0, max: 0.95 },
+                    { id: 'reverbSize', cc: 28, min: 0.5, max: 5 }
+                ];
+                params.forEach(param => {
+                    const value = parseFloat(document.getElementById(param.id).value);
+                    const midiValue = Math.round((value - param.min) / (param.max - param.min) * 127);
+                    midiOutput.send([status, param.cc, midiValue]);
+                });
             }
         }
 
