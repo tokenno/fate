@@ -1,0 +1,21 @@
+{
+  "name": "Blowback Synthesizer",
+  "short_name": "Blowback",
+  "description": "A live Phase Modulation Synthesis synthesizer with LFO and sensor controls.",
+  "start_url": "https://tokenno.github.io/fate/",
+  "display": "standalone",
+  "background_color": "#0a0a1a",
+  "theme_color": "#ff0066",
+  "icons": [
+    {
+      "src": "/fate192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/fate512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
