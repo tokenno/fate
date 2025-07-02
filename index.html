@@ -76,7 +76,7 @@
             text-shadow: 0 0 8px #ff0066;
         }
         .help-button {
-            position: absolute; top: -10px; right: -10px;
+            position: absolute; top: 250px; right: 410px;
             background: #000; border: 2px solid #ff0066;
             border-radius: 50%; width: 30px; height: 30px;
             display: flex; align-items: center; justify-content: center;
@@ -125,12 +125,13 @@
     <div class="logo">
         <img src="fate192.png" alt="Fate Logo">
    <BR>
-           <label class="block text-base font-bold">| Blowback |</label>
+         
+            <h2 class="text-2xl font-bold glitch section-header">Blowback</h2>
     </div>
     <div class="control-panel w-full max-w-4xl">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
             <div class="space-y-4 relative">
-                <h2 class="text-2xl font-bold glitch section-header">Oscillator</h2>
+                  <h2  class="glitch-button bold-button bold-button-flicker">Oscillator</h2>
                 <div class="slider-container tooltip" data-tooltip="Base frequency (20-4000 Hz)">
                     <label class="block text-base font-bold">Frequency</label>
                     <input type="range" id="freq" min="20" max="4000" value="440" class="w-full">
@@ -149,7 +150,7 @@
                 </div>
             </div>
             <div class="space-y-4">
-                <h2 class="text-2xl font-bold glitch section-header">LFO</h2>
+                  <h2  class="glitch-button bold-button bold-button-flicker">LFO</h2>
                 <div class="slider-container tooltip" data-tooltip="LFO rate (0-50 Hz)">
                     <label class="block text-base font-bold">LFO Rate</label>
                     <input type="range" id="lfoRate" min="0" max="50" value="5" class="w-full">
@@ -164,7 +165,7 @@
                 </div>
             </div>
             <div class="space-y-4 relative">
-                <h2 class="text-2xl font-bold glitch section-header">Effects</h2>
+                <h2  class="glitch-button bold-button bold-button-flicker">Effects</h2>
                 <div class="slider-container tooltip" data-tooltip="Distortion amount (0-2)">
                     <label class="block text-base font-bold">Distortion</label>
                     <input type="range" id="distortion" min="0" max="2" step="0.01" value="0.2" class="w-full">
@@ -184,6 +185,7 @@
                 <div class="help-button" id="helpButton">?</div>
             </div>
         </div>
+        
         <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             <button id="oscToggle" class="glitch-button bold-button bold-button-flicker">Start Osc</button>
             <button id="lfoToggle" class="glitch-button bold-button bold-button-flicker">Start LFO</button>
@@ -198,6 +200,7 @@
             <button id="recordToggle" class="glitch-button bold-button bold-button-flicker">Start Recording</button>
             <button id="midiToggle" class="glitch-button">Disable MIDI</button>
             <div class="mt-4 flex justify-center gap-4">
+                
                 <select id="midiOutputSelect" class="glitch-button" style="padding: 8px; width: 200px;">
                     <option value="" disabled selected>Select MIDI Output Port</option>
                 </select>
