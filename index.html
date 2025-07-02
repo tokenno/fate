@@ -249,52 +249,66 @@
         Recording: <span id="recordStatus">Not recording</span>
     </div>
     <div id="helpPopup" class="help-popup">
-        <button class="close-button" id="closeHelp">×</button>
-        <h3 class="text-xl font-bold glitch section-header">Blowback Features & Help</h3>
-        <p><strong>ABOUT:</strong></p>
-        <ul><li><strong>Blowback</strong> is a synthesizer based on Phase Modulation Synthesis.</li>
-            <li><strong>Inspiration</strong> for its development sparkled from a Pure Data patch, then ported and finalized in JavaScript and Web Audio API.</li>
-            <li><strong>Blowback</strong> is made to be played live.</li>
-            <li><strong>Random Interval:</strong> Set it very low for a non-stop modulation joyride.</li></ul>
-        <p><strong>Oscillator Controls:</strong></p>
-        <ul><li><strong>Frequency:</strong> Adjusts the base pitch (20-4000 Hz).</li>
-            <li><strong>Mod Depth:</strong> Sets modulation depth (0-2000 Hz).</li>
-            <li><strong>Filter Cutoff:</strong> Controls low-pass filter cutoff (60-20000 Hz).</li>
-            <li><strong>Random Interval:</strong> Sets randomization interval (20ms-5s).</li></ul>
-        <p><strong>LFO Controls:</strong></p>
-        <ul><li><strong>LFO Rate:</strong> Adjusts LFO rate (0-50 Hz).</li>
-            <li><strong>LFO Amp:</strong> Sets LFO amplitude (0-2).</li>
-            <li><strong>Sensor Sensitivity:</strong> Scales sensor input (0.5x-2x).</li></ul>
-        <p><strong>Effects Controls:</strong></p>
-        <ul><li><strong>Distortion:</strong> Adjusts distortion amount (0-2).</li>
-            <li><strong>Reverb Size:</strong> Sets reverb impulse size (0.5-5s).</li>
-            <li><strong>Reverb Feedback:</strong> Controls reverb feedback (0-0.95).</li>
-            <li><strong>Freeze Threshold:</strong> Sets freeze trigger threshold (0-20 m/s²).</li></ul>
-        <p><strong>Button Controls:</strong></p>
-        <ul><li><strong>Start Osc:</strong> Starts/stops the oscillator.</li>
-            <li><strong>Start LFO:</strong> Enables/disables the LFO.</li>
-            <li><strong>Enable Sensors:</strong> Toggles sensor input (disables random when enabled).</li>
-            <li><strong>Calibrate Sensors:</strong> Calibrates sensor baseline.</li>
-            <li><strong>Freeze Effect:</strong> Freezes/unfreezes audio buffer.</li>
-            <li><strong>Freeze: Shake Mode/Tilt Mode:</strong> Switches freeze trigger mode.</li>
-            <li><strong>Enable Freeze Sensor:</strong> Toggles freeze sensor.</li>
-            <li><strong>Randomize Every Xs:</strong> Starts/stops parameter randomization.</li>
-            <li><strong>Switch to Gradual Mode:</strong> Toggles between random and gradual modulation.</li>
-            <li><strong>Enable Reverb:</strong> Toggles reverb effect.</li>
-            <li><strong>Include Reverb in Random:</strong> Includes/excludes reverb in randomization.</li>
-            <li><strong>Start Recording:</strong> Starts/stops audio recording (up to 5 minutes).</li>
-            <li><strong>Disable MIDI:</strong> Toggles MIDI output.</li></ul>
-        <p><strong>Visuals & Status:</strong></p>
-        <ul><li><strong>Dot Visual:</strong> Minimal moving dot with trail.</li>
-            <li><strong>MIDI Status:</strong> Displays MIDI connection state.</li>
-            <li><strong>Sensors Status:</strong> Shows sensor activity and mode.</li>
-            <li><strong>Recording Status:</strong> Indicates recording state and duration.</li></ul>
-        <p><strong>MIDI Controllers:</strong></p>
-        <ul><li><strong>MIDI Output:</strong> Select the output port.</li>
-            <li><strong>MIDI Channel:</strong> Choose the MIDI channel (1-16).</li>
-            <li><strong>Modulation Matrix:</strong> Select which parameters send MIDI CC (18-25).</li></ul>
-        <p><strong>Notes:</strong> Requires HTTPS for sensors and modern browsers for MIDI/recording. Use MIDI CC 18-25 for parameter control.</p>
-    </div>
+    <button class="close-button" id="closeHelp">×</button>
+    <h3 class="text-xl font-bold glitch section-header">Blowback Features & Help</h3>
+    <p><strong>ABOUT:</strong></p>
+    <ul>
+        <li><strong>Blowback</strong> is a synthesizer based on Phase Modulation Synthesis.</li>
+        <li><strong>Inspiration</strong> sparkled from a Pure Data patch, then ported and finalized in JavaScript and Web Audio API.</li>
+        <li><strong>Blowback</strong> is made to be played live.</li>
+        <li><strong>Random Interval:</strong> Set it very low for a non-stop modulation joyride, now starting at 50ms for fast initial randomization.</li>
+    </ul>
+    <p><strong>Oscillator Controls:</strong></p>
+    <ul>
+        <li><strong>Frequency:</strong> Adjusts the base pitch (20-4000 Hz).</li>
+        <li><strong>Mod Depth:</strong> Sets modulation depth (0-2000 Hz).</li>
+        <li><strong>Filter Cutoff:</strong> Controls low-pass filter cutoff (60-20000 Hz).</li>
+        <li><strong>Random Interval:</strong> Sets randomization interval (20ms-5s), now initialized at 50ms.</li>
+    </ul>
+    <p><strong>LFO Controls:</strong></p>
+    <ul>
+        <li><strong>LFO Rate:</strong> Adjusts LFO rate (0-50 Hz).</li>
+        <li><strong>LFO Amp:</strong> Sets LFO amplitude (0-2).</li>
+        <li><strong>Sensor Sensitivity:</strong> Scales sensor input (0.5x-2x).</li>
+    </ul>
+    <p><strong>Effects Controls:</strong></p>
+    <ul>
+        <li><strong>Distortion:</strong> Adjusts distortion amount (0-2).</li>
+        <li><strong>Reverb Size:</strong> Sets reverb impulse size (0.5-5s).</li>
+        <li><strong>Reverb Feedback:</strong> Controls reverb feedback (0-0.95).</li>
+        <li><strong>Freeze Threshold:</strong> Sets freeze trigger threshold (0-20 m/s²) for sensor-based freezing.</li>
+    </ul>
+    <p><strong>Button Controls:</strong></p>
+    <ul>
+        <li><strong>Start Osc:</strong> Starts/stops the oscillator.</li>
+        <li><strong>Start LFO:</strong> Enables/disables the LFO.</li>
+        <li><strong>Enable Sensors:</strong> Toggles sensor input (disables random when enabled).</li>
+        <li><strong>Calibrate Sensors:</strong> Calibrates sensor baseline.</li>
+        <li><strong>Freeze Effect:</strong> Freezes/unfreezes audio buffer, capturing current state including reverb.</li>
+        <li><strong>Freeze: Shake Mode/Tilt Mode:</strong> Switches freeze trigger mode between shake and tilt detection.</li>
+        <li><strong>Enable Freeze Sensor:</strong> Toggles freeze activation via sensor input.</li>
+        <li><strong>Randomize Every Xs:</strong> Starts/stops parameter randomization, now starting at 50ms intervals.</li>
+        <li><strong>Switch to Gradual Mode:</strong> Toggles between random and smooth gradual modulation.</li>
+        <li><strong>Enable Reverb:</strong> Toggles reverb effect.</li>
+        <li><strong>Include Reverb in Random:</strong> Includes/excludes reverb in randomization.</li>
+        <li><strong>Start Recording:</strong> Starts/stops audio recording (up to 5 minutes).</li>
+        <li><strong>Disable MIDI:</strong> Toggles MIDI output.</li>
+    </ul>
+    <p><strong>Visuals & Status:</strong></p>
+    <ul>
+        <li><strong>Dot Visual:</strong> Minimal moving dot with trail.</li>
+        <li><strong>MIDI Status:</strong> Displays MIDI connection state.</li>
+        <li><strong>Sensors Status:</strong> Shows sensor activity and mode.</li>
+        <li><strong>Recording Status:</strong> Indicates recording state and duration.</li>
+    </ul>
+    <p><strong>MIDI Controllers:</strong></p>
+    <ul>
+        <li><strong>MIDI Output:</strong> Select the output port.</li>
+        <li><strong>MIDI Channel:</strong> Choose the MIDI channel (1-16).</li>
+        <li><strong>Modulation Matrix:</strong> Select which parameters send MIDI CC (18-25).</li>
+    </ul>
+    <p><strong>Notes:</strong> Requires HTTPS for sensors and modern browsers for MIDI/recording. Use MIDI CC 18-25 for parameter control. Freeze feature uses offline rendering to capture audio state, including reverb.</p>
+</div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
