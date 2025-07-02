@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background: linear-gradient(135deg, #0a0a1a, #1a0a1a); color: #f0f0f0; font-family: 'Arial', sans-serif; }
-        canvas { position: absolute; top: 0; left: 0; z-index: -1; opacity: 0.6; }
+        canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.6; }
         .glitch { animation: glitch 0.3s linear infinite; }
         @keyframes glitch {
             0%, 100% { transform: translate(0); }
@@ -108,6 +108,15 @@
             0%, 100% { filter: drop-shadow(0 0 10px #ff0066) drop-shadow(0 0 15px #6600ff); }
             50% { filter: drop-shadow(0 0 15px #6600ff) drop-shadow(0 0 20px #ff0066); }
         }
+        /* Updated styles for changing green color with animation */
+.random-override-label {
+    color: #028ec1; /* Base green color */
+}
+.midi-override-label {
+    color: #79a2be; /* Base green color */
+
+}
+
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -124,9 +133,9 @@
     <canvas id="visuals" class="w-full h-full"></canvas>
     <div class="logo">
         <img src="fate192.png" alt="Fate Logo">
-     
     </div>
-     <h2 class="glitch-button bold-button bold-button-flicker">Blowback</h2><br>
+   <br> <br> <br> <br>
+    <h2 class="glitch-button bold-button bold-button-flicker">Blowback</h2><br>
     <div class="control-panel w-full max-w-4xl">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
             <div class="space-y-4 relative">
@@ -232,18 +241,20 @@
                     <option value="chua">Chua Attractor</option>
                 </select>
             </div>
-            <div id="modMatrix" class="mt-4 grid grid-cols-2 gap-2">
-                <label><input type="checkbox" id="freqMidi" checked> Frequency (CC 18)</label>
-                <label><input type="checkbox" id="modDepthMidi" checked> Mod Depth (CC 19)</label>
-                <label><input type="checkbox" id="filterCutoffMidi" checked> Filter Cutoff (CC 20)</label>
-                <label><input type="checkbox" id="lfoRateMidi" checked> LFO Rate (CC 21)</label>
-                <label><input type="checkbox" id="lfoAmpMidi" checked> LFO Amp (CC 22)</label>
-                <label><input type="checkbox" id="distortionMidi" checked> Distortion (CC 23)</label>
-                <label><input type="checkbox" id="reverbFeedbackMidi" checked> Reverb Feedback (CC 24)</label>
-                <label><input type="checkbox" id="reverbSizeMidi" checked> Reverb Size (CC 25)</label>
-                <label><input type="checkbox" id="freqRandom" checked> Frequency Random</label>
-                <label><input type="checkbox" id="lfoRateRandom" checked> LFO Rate Random</label>
-            </div>
+       <div id="modMatrix" class="mt-4 grid grid-cols-2 gap-2">
+    <label class="random-override-label"><input type="checkbox" id="freqRandom" checked> Frequency Random</label>
+    <label class="random-override-label"><input type="checkbox" id="lfoRateRandom" checked> LFO Rate Random</label>
+    <label class="random-override-label"><input type="checkbox" id="filterCutoffRandom" checked> Filter Cutoff Random</label>
+    <label class="random-override-label"><input type="checkbox" id="modDepthRandom" checked> Mod Depth Random</label>
+    <label class="midi-override-label"><input type="checkbox" id="freqMidi" checked> Frequency (CC 18)</label>
+    <label class="midi-override-label"><input type="checkbox" id="modDepthMidi" checked> Mod Depth (CC 19)</label>
+    <label class="midi-override-label"><input type="checkbox" id="filterCutoffMidi" checked> Filter Cutoff (CC 20)</label>
+    <label class="midi-override-label"><input type="checkbox" id="lfoRateMidi" checked> LFO Rate (CC 21)</label>
+    <label class="midi-override-label"><input type="checkbox" id="lfoAmpMidi" checked> LFO Amp (CC 22)</label>
+    <label class="midi-override-label"><input type="checkbox" id="distortionMidi" checked> Distortion (CC 23)</label>
+    <label class="midi-override-label"><input type="checkbox" id="reverbFeedbackMidi" checked> Reverb Feedback (CC 24)</label>
+    <label class="midi-override-label"><input type="checkbox" id="reverbSizeMidi" checked> Reverb Size (CC 25)</label>
+</div>
             <button id="modeToggle" class="glitch-button">Switch to Gradual Mode</button>
         </div>
     </div>
@@ -407,29 +418,42 @@
                 document.getElementById('freezeToggle').textContent = isFreezeActive ? 'Unfreeze' : 'Freeze Effect';
             }
 
-            function toggleReverb() { isReverbActive = !isReverbActive;
+            function toggleReverb() { 
+                isReverbActive = !isReverbActive;
                 reverbGain.gain.setValueAtTime(isReverbActive ? document.getElementById('reverbFeedback').value : 0, ctx.currentTime);
                 dryGain.gain.setValueAtTime(isReverbActive ? (1 - document.getElementById('reverbFeedback').value) : 1, ctx.currentTime);
-                document.getElementById('reverbToggle').textContent = isReverbActive ? 'Disable Reverb' : 'Enable Reverb'; }
+                document.getElementById('reverbToggle').textContent = isReverbActive ? 'Disable Reverb' : 'Enable Reverb'; 
+            }
 
-            function toggleReverbRandom() { isReverbRandomized = !isReverbRandomized;
-                document.getElementById('reverbRandomToggle').textContent = isReverbRandomized ? 'Exclude Reverb from Random' : 'Include Reverb in Random'; }
+            function toggleReverbRandom() { 
+                isReverbRandomized = !isReverbRandomized;
+                document.getElementById('reverbRandomToggle').textContent = isReverbRandomized ? 'Exclude Reverb from Random' : 'Include Reverb in Random'; 
+            }
 
-            function toggleFreezeMode() { isFreezeShakeMode = !isFreezeShakeMode;
+            function toggleFreezeMode() { 
+                isFreezeShakeMode = !isFreezeShakeMode;
                 document.getElementById('freezeModeToggle').textContent = isFreezeShakeMode ? 'Freeze: Tilt Mode' : 'Freeze: Shake Mode';
-                document.getElementById('sensorStatus').textContent = isSensorActive ? `Active (Calibrated, ${isFreezeShakeMode ? 'Shake' : 'Tilt'} Mode, Freeze Sensor ${isFreezeSensorActive ? 'On' : 'Off'})` : `Supported (Hold steady and click 'Calibrate Sensors', ${isFreezeShakeMode ? 'Shake' : 'Tilt'} Mode, Freeze Sensor ${isFreezeSensorActive ? 'On' : 'Off'})`; }
+                document.getElementById('sensorStatus').textContent = isSensorActive ? `Active (Calibrated, ${isFreezeShakeMode ? 'Shake' : 'Tilt'} Mode, Freeze Sensor ${isFreezeSensorActive ? 'On' : 'Off'})` : `Supported (Hold steady and click 'Calibrate Sensors', ${isFreezeShakeMode ? 'Shake' : 'Tilt'} Mode, Freeze Sensor ${isFreezeSensorActive ? 'On' : 'Off'})`; 
+            }
 
-            function toggleFreezeSensor() { isFreezeSensorActive = !isFreezeSensorActive;
+            function toggleFreezeSensor() { 
+                isFreezeSensorActive = !isFreezeSensorActive;
                 document.getElementById('freezeSensorToggle').textContent = isFreezeSensorActive ? 'Disable Freeze Sensor' : 'Enable Freeze Sensor';
-                document.getElementById('sensorStatus').textContent = isSensorActive ? `Active (Calibrated, ${isFreezeShakeMode ? 'Shake' : 'Tilt'} Mode, Freeze Sensor ${isFreezeSensorActive ? 'On' : 'Off'})` : `Supported (Hold steady and click 'Calibrate Sensors', ${isFreezeShakeMode ? 'Shake' : 'Tilt'} Mode, Freeze Sensor ${isFreezeSensorActive ? 'On' : 'Off'})`; }
+                document.getElementById('sensorStatus').textContent = isSensorActive ? `Active (Calibrated, ${isFreezeShakeMode ? 'Shake' : 'Tilt'} Mode, Freeze Sensor ${isFreezeSensorActive ? 'On' : 'Off'})` : `Supported (Hold steady and click 'Calibrate Sensors', ${isFreezeShakeMode ? 'Shake' : 'Tilt'} Mode, Freeze Sensor ${isFreezeSensorActive ? 'On' : 'Off'})`; 
+            }
 
-            function toggleRecording() { if (!isRecording) { if (!isOscPlaying) { alert('Start the oscillator first to record audio.'); return; }
-                recorder.start(); isRecording = true; recordStartTime = performance.now(); document.getElementById('recordToggle').textContent = 'Stop Recording';
-                document.getElementById('recordStatus').textContent = 'Recording... 0s'; const updateTime = setInterval(() => {
-                    if (!isRecording) { clearInterval(updateTime); return; } const elapsed = (performance.now() - recordStartTime) / 1000;
-                    document.getElementById('recordStatus').textContent = `Recording... ${elapsed.toFixed(1)}s`; if (elapsed >= 300) toggleRecording(); }, 100);
-            } else { recorder.stop(); isRecording = false; document.getElementById('recordToggle').textContent = 'Start Recording';
-                document.getElementById('recordStatus').textContent = 'Not recording'; } }
+            function toggleRecording() { 
+                if (!isRecording) { 
+                    if (!isOscPlaying) { alert('Start the oscillator first to record audio.'); return; }
+                    recorder.start(); isRecording = true; recordStartTime = performance.now(); document.getElementById('recordToggle').textContent = 'Stop Recording';
+                    document.getElementById('recordStatus').textContent = 'Recording... 0s'; const updateTime = setInterval(() => {
+                        if (!isRecording) { clearInterval(updateTime); return; } const elapsed = (performance.now() - recordStartTime) / 1000;
+                        document.getElementById('recordStatus').textContent = `Recording... ${elapsed.toFixed(1)}s`; if (elapsed >= 300) toggleRecording(); }, 100);
+                } else { 
+                    recorder.stop(); isRecording = false; document.getElementById('recordToggle').textContent = 'Start Recording';
+                    document.getElementById('recordStatus').textContent = 'Not recording'; 
+                } 
+            }
 
             const attractors = {
                 lorenz: { sigma: 10, rho: 28, beta: 8/3 },
@@ -481,10 +505,10 @@
                 updateAttractor(attractorType);
                 if (isGradualMode) {
                     targetParams.freq = document.getElementById('freqRandom').checked ? Math.max(20, Math.min(4000, (attractorState1.x + 15) / 30 * 3980)) : parseFloat(document.getElementById('freq').value);
-                    targetParams.modDepth = Math.max(0, Math.min(2000, (attractorState1.y + 15) / 30 * 2000 * 0.7));
+                    targetParams.modDepth = document.getElementById('modDepthRandom').checked ? Math.max(0, Math.min(2000, (attractorState1.y + 15) / 30 * 2000 * 0.7)) : parseFloat(document.getElementById('modDepth').value);
                     targetParams.lfoRate = document.getElementById('lfoRateRandom').checked ? Math.max(0, Math.min(50, (attractorState1.z + 15) / 30 * 50 * 0.4)) : parseFloat(document.getElementById('lfoRate').value);
                     targetParams.lfoAmp = Math.max(0, Math.min(2, ((Math.sin(attractorState1.x) + 1) / 2 * 2)));
-                    targetParams.filterCutoff = Math.max(60, Math.min(20000, (attractorState2.y + 15) / 30 * 19980));
+                    targetParams.filterCutoff = document.getElementById('filterCutoffRandom').checked ? Math.max(60, Math.min(20000, (attractorState2.y + 15) / 30 * 19980)) : parseFloat(document.getElementById('filterCutoff').value);
                     targetParams.distortion = Math.max(0, Math.min(2, (Math.abs(attractorState1.z) + 15) / 30 * 2 * 0.5));
                     if (isReverbRandomized) {
                         targetParams.reverbFeedback = Math.max(0, Math.min(0.95, ((Math.cos(attractorState1.x) + 1) / 2 * 0.95)));
@@ -495,10 +519,10 @@
                     }
                 } else {
                     targetParams.freq = document.getElementById('freqRandom').checked && Math.random() > 0.5 ? Math.max(20, Math.min(4000, parseFloat(document.getElementById('freq').value) + (Math.random() * 200 - 100))) : parseFloat(document.getElementById('freq').value);
-                    targetParams.modDepth = Math.max(0, Math.min(2000, parseFloat(document.getElementById('modDepth').value) + (Math.random() * 200 - 100) * 0.7));
+                    targetParams.modDepth = document.getElementById('modDepthRandom').checked && Math.random() > 0.5 ? Math.max(0, Math.min(2000, parseFloat(document.getElementById('modDepth').value) + (Math.random() * 200 - 100) * 0.7)) : parseFloat(document.getElementById('modDepth').value);
                     targetParams.lfoRate = document.getElementById('lfoRateRandom').checked && Math.random() > 0.5 ? Math.max(0, Math.min(50, parseFloat(document.getElementById('lfoRate').value) + (Math.random() * 5 - 2.5) * 0.4)) : parseFloat(document.getElementById('lfoRate').value);
                     targetParams.lfoAmp = Math.max(0, Math.min(2, parseFloat(document.getElementById('lfoAmp').value) + (Math.random() * 0.2 - 0.1)));
-                    targetParams.filterCutoff = Math.max(60, Math.min(20000, parseFloat(document.getElementById('filterCutoff').value) + (Math.random() * 1000 - 500) * 1.2));
+                    targetParams.filterCutoff = document.getElementById('filterCutoffRandom').checked && Math.random() > 0.5 ? Math.max(60, Math.min(20000, parseFloat(document.getElementById('filterCutoff').value) + (Math.random() * 1000 - 500) * 1.2)) : parseFloat(document.getElementById('filterCutoff').value);
                     targetParams.distortion = Math.max(0, Math.min(2, parseFloat(document.getElementById('distortion').value) + (Math.random() * 0.2 - 0.1) * 0.5));
                     if (isReverbRandomized) {
                         targetParams.reverbFeedback = Math.max(0, Math.min(0.95, parseFloat(document.getElementById('reverbFeedback').value) + (Math.random() * 0.1 - 0.05)));
@@ -556,11 +580,19 @@
                     setTargetParams();
                 }
 
-                document.getElementById('freq').value = interpolateValue(parseFloat(document.getElementById('freq').value), targetParams.freq, Math.min(transitionProgress, 1)).toFixed(2);
-                document.getElementById('modDepth').value = interpolateValue(parseFloat(document.getElementById('modDepth').value), targetParams.modDepth, Math.min(transitionProgress, 1)).toFixed(2);
-                document.getElementById('lfoRate').value = interpolateValue(parseFloat(document.getElementById('lfoRate').value), targetParams.lfoRate, Math.min(transitionProgress, 1)).toFixed(2);
+                if (document.getElementById('freqRandom').checked) {
+                    document.getElementById('freq').value = interpolateValue(parseFloat(document.getElementById('freq').value), targetParams.freq, Math.min(transitionProgress, 1)).toFixed(2);
+                }
+                if (document.getElementById('modDepthRandom').checked) {
+                    document.getElementById('modDepth').value = interpolateValue(parseFloat(document.getElementById('modDepth').value), targetParams.modDepth, Math.min(transitionProgress, 1)).toFixed(2);
+                }
+                if (document.getElementById('lfoRateRandom').checked) {
+                    document.getElementById('lfoRate').value = interpolateValue(parseFloat(document.getElementById('lfoRate').value), targetParams.lfoRate, Math.min(transitionProgress, 1)).toFixed(2);
+                }
                 document.getElementById('lfoAmp').value = interpolateValue(parseFloat(document.getElementById('lfoAmp').value), targetParams.lfoAmp, Math.min(transitionProgress, 1)).toFixed(2);
-                document.getElementById('filterCutoff').value = interpolateValue(parseFloat(document.getElementById('filterCutoff').value), targetParams.filterCutoff, Math.min(transitionProgress, 1)).toFixed(2);
+                if (document.getElementById('filterCutoffRandom').checked) {
+                    document.getElementById('filterCutoff').value = interpolateValue(parseFloat(document.getElementById('filterCutoff').value), targetParams.filterCutoff, Math.min(transitionProgress, 1)).toFixed(2);
+                }
                 document.getElementById('distortion').value = interpolateValue(parseFloat(document.getElementById('distortion').value), targetParams.distortion, Math.min(transitionProgress, 1)).toFixed(2);
                 if (isReverbRandomized) {
                     document.getElementById('reverbFeedback').value = interpolateValue(parseFloat(document.getElementById('reverbFeedback').value), targetParams.reverbFeedback, Math.min(transitionProgress, 1)).toFixed(2);
@@ -572,7 +604,8 @@
                 requestAnimationFrame(smoothTransition);
             }
 
-            function toggleRandomize() { isRandomizing = !isRandomizing;
+            function toggleRandomize() { 
+                isRandomizing = !isRandomizing;
                 const interval = parseFloat(document.getElementById('randomInterval').value);
                 document.getElementById('randomizeToggle').textContent = isRandomizing ? `Stop ${isGradualMode ? 'Gradual' : 'Random'} Every ${interval < 1 ? (interval * 1000).toFixed(0) + 'ms' : interval.toFixed(1) + 's'}` : `${isGradualMode ? 'Gradual' : 'Random'} Every ${interval < 1 ? (interval * 1000).toFixed(0) + 'ms' : interval.toFixed(1) + 's'}`;
                 if (isRandomizing) {
@@ -580,10 +613,14 @@
                     smoothTransition();
                 } else {
                     transitionProgress = 0;
+                    logo.style.transform = 'rotate(0deg)';
                 }
             }
 
-            function toggleMode() { isGradualMode = !isGradualMode; attractorState1 = { x: 0.1, y: 0.1, z: 0.1 }; attractorState2 = { x: 1.0, y: 1.0, z: 1.0 };
+            function toggleMode() { 
+                isGradualMode = !isGradualMode; 
+                attractorState1 = { x: 0.1, y: 0.1, z: 0.1 }; 
+                attractorState2 = { x: 1.0, y: 1.0, z: 1.0 };
                 const interval = parseFloat(document.getElementById('randomInterval').value);
                 document.getElementById('modeToggle').textContent = `Switch to ${isGradualMode ? 'Random' : 'Gradual'} Mode`;
                 document.getElementById('randomizeToggle').textContent = isRandomizing ? `Stop ${isGradualMode ? 'Gradual' : 'Random'} Every ${interval < 1 ? (interval * 1000).toFixed(0) + 'ms' : interval.toFixed(1) + 's'}` : `${isGradualMode ? 'Gradual' : 'Random'} Every ${interval < 1 ? (interval * 1000).toFixed(0) + 'ms' : interval.toFixed(1) + 's'}`;
@@ -656,8 +693,18 @@
 
             const canvas = document.getElementById('visuals'); const c = canvas.getContext('2d');
             let dot = { x: canvas.width / 2, y: canvas.height / 2, vx: 1, vy: 1, trail: [] };
+            const logo = document.querySelector('.logo img');
+            let logoAngle = 0;
 
-            function initCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; animateCanvas(); }
+            function initCanvas() { 
+                canvas.width = window.innerWidth; 
+                canvas.height = window.innerHeight; 
+                logo.style.position = 'absolute'; 
+                logo.style.left = `${(window.innerWidth - logo.width) / 2}px`; // Center horizontally at top
+                logo.style.top = '20px'; // 20px from top of page
+                logo.style.transformOrigin = 'center center'; // Rotate around center of logo
+                animateCanvas(); 
+            }
 
             function animateCanvas() {
                 c.fillStyle = 'rgba(0, 0, 0, 0.02)'; c.fillRect(0, 0, canvas.width, canvas.height);
@@ -666,18 +713,36 @@
                 if (dot.trail.length > 5) dot.trail.shift(); c.beginPath(); c.arc(dot.x, dot.y, 2, 0, Math.PI * 2);
                 c.fillStyle = 'hsl(300, 70%, 50%)'; c.fill(); dot.trail.forEach((t, i) => {
                     c.beginPath(); c.arc(t.x, t.y, 1, 0, Math.PI * 2); c.fillStyle = `rgba(255, 100, 100, ${1 - i / 5})`; c.fill(); });
+
+                // Spin logo based on lfoRate when random mode is on
+                if (isRandomizing) {
+                    const lfoRate = parseFloat(document.getElementById('lfoRate').value) || 0; // Get current LFO rate (0-50)
+                    logoAngle += lfoRate * 0.001; // Adjust spin speed based on lfoRate (scaled for smooth rotation)
+                    logo.style.transform = `rotate(${logoAngle}deg)`;
+                } else {
+                    logo.style.transform = 'rotate(0deg)';
+                }
+
                 requestAnimationFrame(animateCanvas);
             }
 
             document.getElementById('oscToggle').addEventListener('click', () => {
-                if (!isOscPlaying) { ctx.resume().then(() => { osc.start(); lfo.start(); isOscPlaying = true;
-                    document.getElementById('oscToggle').textContent = 'Stop Osc'; updateParams(); }).catch(err => console.error('Audio context resume failed:', err)); }
-                else { osc.stop(); lfo.stop(); if (freezeSource) { freezeSource.stop(); freezeSource.disconnect(); freezeSource = null; freezeBuffer = null; }
-                    isOscPlaying = false; document.getElementById('oscToggle').textContent = 'Start Osc'; initAudio(); updateParams(); } });
+                if (!isOscPlaying) { 
+                    ctx.resume().then(() => { 
+                        osc.start(); lfo.start(); isOscPlaying = true;
+                        document.getElementById('oscToggle').textContent = 'Stop Osc'; updateParams(); 
+                    }).catch(err => console.error('Audio context resume failed:', err)); 
+                } else { 
+                    osc.stop(); lfo.stop(); if (freezeSource) { freezeSource.stop(); freezeSource.disconnect(); freezeSource = null; freezeBuffer = null; }
+                    isOscPlaying = false; document.getElementById('oscToggle').textContent = 'Start Osc'; initAudio(); updateParams(); 
+                } 
+            });
 
-            document.getElementById('lfoToggle').addEventListener('click', () => { isLfoActive = !isLfoActive;
+            document.getElementById('lfoToggle').addEventListener('click', () => { 
+                isLfoActive = !isLfoActive;
                 lfo.frequency.setValueAtTime(isLfoActive ? document.getElementById('lfoRate').value : 0, ctx.currentTime);
-                document.getElementById('lfoToggle').textContent = isLfoActive ? 'Stop LFO' : 'Start LFO'; });
+                document.getElementById('lfoToggle').textContent = isLfoActive ? 'Stop LFO' : 'Start LFO'; 
+            });
 
             document.getElementById('freezeToggle').addEventListener('click', toggleFreeze);
             document.getElementById('freezeModeToggle').addEventListener('click', toggleFreezeMode);
@@ -686,15 +751,20 @@
             document.getElementById('reverbRandomToggle').addEventListener('click', toggleReverbRandom);
             document.getElementById('recordToggle').addEventListener('click', toggleRecording);
 
-            document.getElementById('sensorToggle').addEventListener('click', () => { isSensorActive = !isSensorActive;
+            document.getElementById('sensorToggle').addEventListener('click', () => { 
+                isSensorActive = !isSensorActive;
                 document.getElementById('sensorToggle').textContent = isSensorActive ? 'Disable Sensors' : 'Enable Sensors';
                 if (isSensorActive && isRandomizing) { isRandomizing = false; transitionProgress = 0;
                     document.getElementById('randomizeToggle').textContent = `${isGradualMode ? 'Gradual' : 'Random'} Every ${document.getElementById('randomInterval').value < 1 ? (document.getElementById('randomInterval').value * 1000).toFixed(0) + 'ms' : document.getElementById('randomInterval').value.toFixed(1) + 's'}`; }
                 document.getElementById('sensorStatus').textContent = isSensorActive ? `Active (Calibrated, ${isFreezeShakeMode ? 'Shake' : 'Tilt'} Mode, Freeze Sensor ${isFreezeSensorActive ? 'On' : 'Off'})` : `Supported (Hold steady and click 'Calibrate Sensors', ${isFreezeShakeMode ? 'Shake' : 'Tilt'} Mode, Freeze Sensor ${isFreezeSensorActive ? 'On' : 'Off'})`;
-                if (!isSensorActive) calibrationData = { x: 0, y: 0 }; });
+                if (!isSensorActive) calibrationData = { x: 0, y: 0 }; 
+            });
 
-            document.getElementById('calibrateToggle').addEventListener('click', () => { if (isSensorActive) {
-                isCalibrating = true; document.getElementById('calibrateToggle').textContent = 'Calibrating...'; } });
+            document.getElementById('calibrateToggle').addEventListener('click', () => { 
+                if (isSensorActive) {
+                    isCalibrating = true; document.getElementById('calibrateToggle').textContent = 'Calibrating...'; 
+                } 
+            });
 
             document.getElementById('randomizeToggle').addEventListener('click', toggleRandomize);
             document.getElementById('modeToggle').addEventListener('click', toggleMode);
@@ -718,16 +788,20 @@
 
             document.getElementById('sensorSensitivity').addEventListener('input', () => {
                 const sensitivity = parseFloat(document.getElementById('sensorSensitivity').value);
-                document.getElementById('sensorSensitivityValue').textContent = sensitivity.toFixed(1); });
+                document.getElementById('sensorSensitivityValue').textContent = sensitivity.toFixed(1); 
+            });
             document.getElementById('freezeThreshold').addEventListener('input', () => {
                 const threshold = parseFloat(document.getElementById('freezeThreshold').value);
-                document.getElementById('freezeThresholdValue').textContent = threshold.toFixed(1); });
+                document.getElementById('freezeThresholdValue').textContent = threshold.toFixed(1); 
+            });
             document.getElementById('reverbFeedback').addEventListener('input', () => {
                 const feedback = parseFloat(document.getElementById('reverbFeedback').value);
-                document.getElementById('reverbFeedbackValue').textContent = feedback.toFixed(2); updateParams(); });
+                document.getElementById('reverbFeedbackValue').textContent = feedback.toFixed(2); updateParams(); 
+            });
             document.getElementById('reverbSize').addEventListener('input', () => {
                 const size = parseFloat(document.getElementById('reverbSize').value);
-                document.getElementById('reverbSizeValue').textContent = size.toFixed(1); updateParams(); });
+                document.getElementById('reverbSizeValue').textContent = size.toFixed(1); updateParams(); 
+            });
             document.getElementById('freq').addEventListener('input', updateParams);
             document.getElementById('modDepth').addEventListener('input', updateParams);
             document.getElementById('lfoRate').addEventListener('input', updateParams);
@@ -736,22 +810,45 @@
             document.getElementById('distortion').addEventListener('input', updateParams);
             document.getElementById('lfoShape').addEventListener('input', updateParams);
 
+            document.getElementById('freqRandom').addEventListener('change', (e) => {
+                if (!e.target.checked && isRandomizing) {
+                    document.getElementById('freq').value = targetParams.freq.toFixed(2);
+                    updateParams();
+                }
+            });
+
+            document.getElementById('modDepthRandom').addEventListener('change', (e) => {
+                if (!e.target.checked && isRandomizing) {
+                    document.getElementById('modDepth').value = targetParams.modDepth.toFixed(2);
+                    updateParams();
+                }
+            });
+
+            document.getElementById('lfoRateRandom').addEventListener('change', (e) => {
+                if (!e.target.checked && isRandomizing) {
+                    document.getElementById('lfoRate').value = targetParams.lfoRate.toFixed(2);
+                    updateParams();
+                }
+            });
+
+            document.getElementById('filterCutoffRandom').addEventListener('change', (e) => {
+                if (!e.target.checked && isRandomizing) {
+                    document.getElementById('filterCutoff').value = targetParams.filterCutoff.toFixed(2);
+                    updateParams();
+                }
+            });
+
             document.getElementById('helpButton').addEventListener('click', () => document.getElementById('helpPopup').classList.add('show'));
             document.getElementById('closeHelp').addEventListener('click', () => document.getElementById('helpPopup').classList.remove('show'));
 
-            document.getElementById('midiToggle').addEventListener('click', () => { isMidiActive = !isMidiActive;
+            document.getElementById('midiToggle').addEventListener('click', () => { 
+                isMidiActive = !isMidiActive;
                 document.getElementById('midiToggle').textContent = isMidiActive ? 'Disable MIDI' : 'Enable MIDI';
-                document.getElementById('midiStatus').textContent = isMidiActive ? (midiOutput ? 'Connected (Output selected)' : 'Connected (No output)') : 'MIDI Disabled'; });
+                document.getElementById('midiStatus').textContent = isMidiActive ? (midiOutput ? 'Connected (Output selected)' : 'Connected (No output)') : 'MIDI Disabled'; 
+            });
 
             initAudio(); initMIDI(); initSensors(); initCanvas();
         });
     </script>
-    <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
-      .then(() => console.log('Service Worker registered'))
-      .catch((error) => console.error('Service Worker registration failed:', error));
-  }
-</script>
 </body>
 </html>
