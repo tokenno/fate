@@ -76,7 +76,7 @@
             text-shadow: 0 0 8px #ff0066;
         }
         .help-button {
-            position: absolute; top: -10px; right: -10px;
+            position: absolute; top: 250px; right: 410px;
             background: #000; border: 2px solid #ff0066;
             border-radius: 50%; width: 30px; height: 30px;
             display: flex; align-items: center; justify-content: center;
@@ -124,12 +124,14 @@
     <canvas id="visuals" class="w-full h-full"></canvas>
     <div class="logo">
         <img src="fate192.png" alt="Fate Logo">
-       | Blowback |
+   <BR>
+         
+            <h2 class="text-2xl font-bold glitch section-header">Blowback</h2>
     </div>
     <div class="control-panel w-full max-w-4xl">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
             <div class="space-y-4 relative">
-                <h2 class="text-2xl font-bold glitch section-header">Oscillator</h2>
+                  <h2  class="glitch-button bold-button bold-button-flicker">Oscillator</h2>
                 <div class="slider-container tooltip" data-tooltip="Base frequency (20-4000 Hz)">
                     <label class="block text-base font-bold">Frequency</label>
                     <input type="range" id="freq" min="20" max="4000" value="440" class="w-full">
@@ -143,12 +145,12 @@
                     <input type="range" id="filterCutoff" min="60" max="20000" value="1000" class="w-full">
                 </div>
                 <div class="slider-container tooltip" data-tooltip="Randomization interval (20ms-5s)">
-                    <label class="block text-base font-bold">Random Interval: <span id="randomIntervalValue">50ms</span></label>
-                    <input type="range" id="randomInterval" min="0.02" max="5" step="0.01" value="0.05" class="w-full">
+                    <label class="block text-base font-bold">Random Interval: <span id="randomIntervalValue">100ms</span></label>
+                    <input type="range" id="randomInterval" min="0.02" max="5" step="0.01" value="0.1" class="w-full">
                 </div>
             </div>
             <div class="space-y-4">
-                <h2 class="text-2xl font-bold glitch section-header">LFO</h2>
+                  <h2  class="glitch-button bold-button bold-button-flicker">LFO</h2>
                 <div class="slider-container tooltip" data-tooltip="LFO rate (0-50 Hz)">
                     <label class="block text-base font-bold">LFO Rate</label>
                     <input type="range" id="lfoRate" min="0" max="50" value="5" class="w-full">
@@ -161,13 +163,9 @@
                     <label class="block text-base font-bold">Sensor Sensitivity: <span id="sensorSensitivityValue">1</span>x</label>
                     <input type="range" id="sensorSensitivity" min="0.5" max="2" step="0.1" value="1" class="w-full">
                 </div>
-                <div class="slider-container tooltip" data-tooltip="Select LFO waveform (0=Sine, 1=Square, 2=Sample & Hold, 3=Random)">
-                    <label class="block text-base font-bold">LFO Shape: <span id="lfoShapeValue">Sine</span></label>
-                    <input type="range" id="lfoShape" min="0" max="2" step="1" value="0" class="w-full">
-                </div>
             </div>
             <div class="space-y-4 relative">
-                <h2 class="text-2xl font-bold glitch section-header">Effects</h2>
+                <h2  class="glitch-button bold-button bold-button-flicker">Effects</h2>
                 <div class="slider-container tooltip" data-tooltip="Distortion amount (0-2)">
                     <label class="block text-base font-bold">Distortion</label>
                     <input type="range" id="distortion" min="0" max="2" step="0.01" value="0.2" class="w-full">
@@ -187,6 +185,7 @@
                 <div class="help-button" id="helpButton">?</div>
             </div>
         </div>
+        
         <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             <button id="oscToggle" class="glitch-button bold-button bold-button-flicker">Start Osc</button>
             <button id="lfoToggle" class="glitch-button bold-button bold-button-flicker">Start LFO</button>
@@ -195,12 +194,13 @@
             <button id="freezeToggle" class="glitch-button bold-button bold-button-flicker">Freeze Effect</button>
             <button id="freezeModeToggle" class="glitch-button">Freeze: Shake Mode</button>
             <button id="freezeSensorToggle" class="glitch-button">Enable Freeze Sensor</button>
-            <button id="randomizeToggle" class="glitch-button bold-button bold-button-flicker">Randomize Every <span id="randomToggleText">50ms</span></button>
+            <button id="randomizeToggle" class="glitch-button bold-button bold-button-flicker">Randomize Every <span id="randomToggleText">100ms</span></button>
             <button id="reverbToggle" class="glitch-button">Enable Reverb</button>
             <button id="reverbRandomToggle" class="glitch-button">Include Reverb in Random</button>
             <button id="recordToggle" class="glitch-button bold-button bold-button-flicker">Start Recording</button>
             <button id="midiToggle" class="glitch-button">Disable MIDI</button>
             <div class="mt-4 flex justify-center gap-4">
+                
                 <select id="midiOutputSelect" class="glitch-button" style="padding: 8px; width: 200px;">
                     <option value="" disabled selected>Select MIDI Output Port</option>
                 </select>
@@ -252,53 +252,66 @@
         Recording: <span id="recordStatus">Not recording</span>
     </div>
     <div id="helpPopup" class="help-popup">
-        <button class="close-button" id="closeHelp">×</button>
-        <h3 class="text-xl font-bold glitch section-header">Blowback Features & Help</h3>
-        <p><strong>ABOUT:</strong></p>
-        <ul><li><strong>Blowback</strong> is a synthesizer based on Phase Modulation Synthesis.</li>
-            <li><strong>Inspiration</strong> for its development sparkled from a Pure Data patch, then ported and finalized in JavaScript and Web Audio API.</li>
-            <li><strong>Blowback</strong> is made to be played live.</li>
-            <li><strong>Random Interval:</strong> Set it very low for a non-stop modulation joyride, now starting at 50ms for fast initial randomization.</li></ul>
-        <p><strong>Oscillator Controls:</strong></p>
-        <ul><li><strong>Frequency:</strong> Adjusts the base pitch (20-4000 Hz).</li>
-            <li><strong>Mod Depth:</strong> Sets modulation depth (0-2000 Hz).</li>
-            <li><strong>Filter Cutoff:</strong> Controls low-pass filter cutoff (60-20000 Hz).</li>
-            <li><strong>Random Interval:</strong> Sets randomization interval (20ms-5s), now initialized at 50ms.</li></ul>
-        <p><strong>LFO Controls:</strong></p>
-        <ul><li><strong>LFO Rate:</strong> Adjusts LFO rate (0-50 Hz).</li>
-            <li><strong>LFO Amp:</strong> Sets LFO amplitude (0-2).</li>
-            <li><strong>Sensor Sensitivity:</strong> Scales sensor input (0.5x-2x).</li>
-            <li><strong>LFO Shape:</strong> Selects waveform (0=Sine, 1=Square, 2=Sample & Hold, 3=Random).</li></ul>
-        <p><strong>Effects Controls:</strong></p>
-        <ul><li><strong>Distortion:</strong> Adjusts distortion amount (0-2).</li>
-            <li><strong>Reverb Size:</strong> Sets reverb impulse size (0.5-5s).</li>
-            <li><strong>Reverb Feedback:</strong> Controls reverb feedback (0-0.95).</li>
-            <li><strong>Freeze Threshold:</strong> Sets freeze trigger threshold (0-20 m/s²) for sensor-based freezing.</li></ul>
-        <p><strong>Button Controls:</strong></p>
-        <ul><li><strong>Start Osc:</strong> Starts/stops the oscillator.</li>
-            <li><strong>Start LFO:</strong> Enables/disables the LFO.</li>
-            <li><strong>Enable Sensors:</strong> Toggles sensor input (disables random when enabled).</li>
-            <li><strong>Calibrate Sensors:</strong> Calibrates sensor baseline.</li>
-            <li><strong>Freeze Effect:</strong> Freezes/unfreezes audio buffer, capturing current state including reverb.</li>
-            <li><strong>Freeze: Shake Mode/Tilt Mode:</strong> Switches freeze trigger mode between shake and tilt detection.</li>
-            <li><strong>Enable Freeze Sensor:</strong> Toggles freeze activation via sensor input.</li>
-            <li><strong>Randomize Every Xs:</strong> Starts/stops parameter randomization, now starting at 50ms intervals.</li>
-            <li><strong>Switch to Gradual Mode:</strong> Toggles between random and smooth gradual modulation.</li>
-            <li><strong>Enable Reverb:</strong> Toggles reverb effect.</li>
-            <li><strong>Include Reverb in Random:</strong> Includes/excludes reverb in randomization.</li>
-            <li><strong>Start Recording:</strong> Starts/stops audio recording (up to 5 minutes).</li>
-            <li><strong>Disable MIDI:</strong> Toggles MIDI output.</li></ul>
-        <p><strong>Visuals & Status:</strong></p>
-        <ul><li><strong>Dot Visual:</strong> Minimal moving dot with trail.</li>
-            <li><strong>MIDI Status:</strong> Displays MIDI connection state.</li>
-            <li><strong>Sensors Status:</strong> Shows sensor activity and mode.</li>
-            <li><strong>Recording Status:</strong> Indicates recording state and duration.</li></ul>
-        <p><strong>MIDI Controllers:</strong></p>
-        <ul><li><strong>MIDI Output:</strong> Select the output port.</li>
-            <li><strong>MIDI Channel:</strong> Choose the MIDI channel (1-16).</li>
-            <li><strong>Modulation Matrix:</strong> Select which parameters send MIDI CC (18-25).</li></ul>
-        <p><strong>Notes:</strong> Requires HTTPS for sensors and modern browsers for MIDI/recording. Use MIDI CC 18-25 for parameter control. Freeze feature uses offline rendering to capture audio state, including reverb.</p>
-    </div>
+    <button class="close-button" id="closeHelp">×</button>
+    <h3 class="text-xl font-bold glitch section-header">Blowback Features & Help</h3>
+    <p><strong>ABOUT:</strong></p>
+    <ul>
+        <li><strong>Blowback</strong> is a synthesizer based on Phase Modulation Synthesis.</li>
+        <li><strong>Inspiration</strong> sparkled from a Pure Data patch, then ported and finalized in JavaScript and Web Audio API.</li>
+        <li><strong>Blowback</strong> is made to be played live.</li>
+        <li><strong>Random Interval:</strong> Set it very low for a non-stop modulation joyride, now starting at 50ms for fast initial randomization.</li>
+    </ul>
+    <p><strong>Oscillator Controls:</strong></p>
+    <ul>
+        <li><strong>Frequency:</strong> Adjusts the base pitch (20-4000 Hz).</li>
+        <li><strong>Mod Depth:</strong> Sets modulation depth (0-2000 Hz).</li>
+        <li><strong>Filter Cutoff:</strong> Controls low-pass filter cutoff (60-20000 Hz).</li>
+        <li><strong>Random Interval:</strong> Sets randomization interval (20ms-5s), now initialized at 50ms.</li>
+    </ul>
+    <p><strong>LFO Controls:</strong></p>
+    <ul>
+        <li><strong>LFO Rate:</strong> Adjusts LFO rate (0-50 Hz).</li>
+        <li><strong>LFO Amp:</strong> Sets LFO amplitude (0-2).</li>
+        <li><strong>Sensor Sensitivity:</strong> Scales sensor input (0.5x-2x).</li>
+    </ul>
+    <p><strong>Effects Controls:</strong></p>
+    <ul>
+        <li><strong>Distortion:</strong> Adjusts distortion amount (0-2).</li>
+        <li><strong>Reverb Size:</strong> Sets reverb impulse size (0.5-5s).</li>
+        <li><strong>Reverb Feedback:</strong> Controls reverb feedback (0-0.95).</li>
+        <li><strong>Freeze Threshold:</strong> Sets freeze trigger threshold (0-20 m/s²) for sensor-based freezing.</li>
+    </ul>
+    <p><strong>Button Controls:</strong></p>
+    <ul>
+        <li><strong>Start Osc:</strong> Starts/stops the oscillator.</li>
+        <li><strong>Start LFO:</strong> Enables/disables the LFO.</li>
+        <li><strong>Enable Sensors:</strong> Toggles sensor input (disables random when enabled).</li>
+        <li><strong>Calibrate Sensors:</strong> Calibrates sensor baseline.</li>
+        <li><strong>Freeze Effect:</strong> Freezes/unfreezes audio buffer, capturing current state including reverb.</li>
+        <li><strong>Freeze: Shake Mode/Tilt Mode:</strong> Switches freeze trigger mode between shake and tilt detection.</li>
+        <li><strong>Enable Freeze Sensor:</strong> Toggles freeze activation via sensor input.</li>
+        <li><strong>Randomize Every Xs:</strong> Starts/stops parameter randomization, now starting at 50ms intervals.</li>
+        <li><strong>Switch to Gradual Mode:</strong> Toggles between random and smooth gradual modulation.</li>
+        <li><strong>Enable Reverb:</strong> Toggles reverb effect.</li>
+        <li><strong>Include Reverb in Random:</strong> Includes/excludes reverb in randomization.</li>
+        <li><strong>Start Recording:</strong> Starts/stops audio recording (up to 5 minutes).</li>
+        <li><strong>Disable MIDI:</strong> Toggles MIDI output.</li>
+    </ul>
+    <p><strong>Visuals & Status:</strong></p>
+    <ul>
+        <li><strong>Dot Visual:</strong> Minimal moving dot with trail.</li>
+        <li><strong>MIDI Status:</strong> Displays MIDI connection state.</li>
+        <li><strong>Sensors Status:</strong> Shows sensor activity and mode.</li>
+        <li><strong>Recording Status:</strong> Indicates recording state and duration.</li>
+    </ul>
+    <p><strong>MIDI Controllers:</strong></p>
+    <ul>
+        <li><strong>MIDI Output:</strong> Select the output port.</li>
+        <li><strong>MIDI Channel:</strong> Choose the MIDI channel (1-16).</li>
+        <li><strong>Modulation Matrix:</strong> Select which parameters send MIDI CC (18-25).</li>
+    </ul>
+    <p><strong>Notes:</strong> Requires HTTPS for sensors and modern browsers for MIDI/recording. Use MIDI CC 18-25 for parameter control. Freeze feature uses offline rendering to capture audio state, including reverb.</p>
+</div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -312,7 +325,7 @@
 
             function initAudio() {
                 osc = ctx.createOscillator(); osc.type = 'sine'; osc.frequency.setValueAtTime(440, ctx.currentTime);
-                lfo = ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.setValueAtTime(5, ctx.currentTime);
+                lfo = ctx.createOscillator(); lfo.type = 'triangle'; lfo.frequency.setValueAtTime(5, ctx.currentTime);
                 modGain = ctx.createGain(); modGain.gain.setValueAtTime(500, ctx.currentTime);
                 lfoAmpGain = ctx.createGain(); lfoAmpGain.gain.setValueAtTime(0.5, ctx.currentTime);
                 filter = ctx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.setValueAtTime(1000, ctx.currentTime);
@@ -353,7 +366,8 @@
                 isFreezeActive = !isFreezeActive;
                 if (isFreezeActive) {
                     try {
-                        const offlineCtx = new OfflineAudioContext(1, ctx.sampleRate * 0.1, ctx.sampleRate);
+                        // Use OfflineAudioContext to capture current state
+                        const offlineCtx = new OfflineAudioContext(1, ctx.sampleRate * 0.1, ctx.sampleRate); // 0.1 seconds
                         const oscCopy = offlineCtx.createOscillator(); oscCopy.type = osc.type;
                         oscCopy.frequency.setValueAtTime(osc.frequency.value, 0);
                         const lfoCopy = offlineCtx.createOscillator(); lfoCopy.type = lfo.type;
@@ -387,6 +401,7 @@
                         freezeSource.connect(output);
                         freezeSource.start(0);
 
+                        // Disconnect live sources but keep reverb path
                         osc.disconnect();
                         lfo.disconnect();
                     } catch (e) {
@@ -399,6 +414,7 @@
                         freezeSource = null;
                         freezeBuffer = null;
                     }
+                    // Reconnect live sources
                     osc.connect(distortion);
                     lfo.connect(modGain);
                     lfo.connect(lfoAmpGain);
@@ -471,7 +487,7 @@
             }
 
             function interpolateValue(start, end, t) {
-                const mu = (1 - Math.cos(t * Math.PI)) / 2;
+                const mu = (1 - Math.cos(t * Math.PI)) / 2; // Cosine interpolation
                 return start + (end - start) * mu;
             }
 
@@ -521,24 +537,6 @@
                 reverbGain.gain.setValueAtTime(isReverbActive ? document.getElementById('reverbFeedback').value : 0, ctx.currentTime);
                 dryGain.gain.setValueAtTime(isReverbActive ? (1 - document.getElementById('reverbFeedback').value) : 1, ctx.currentTime);
                 const size = parseFloat(document.getElementById('reverbSize').value); reverb.buffer = generateReverbImpulse(size);
-
-                // Update LFO shape
-                const lfoShape = parseInt(document.getElementById('lfoShape').value);
-                switch (lfoShape) {
-                    case 0: lfo.type = 'sine'; break; // Sine
-                    case 1: lfo.type = 'square'; break; // Square
-                    case 2: lfo.type = 'square'; lfo.frequency.setValueAtTime(0, ctx.currentTime); // Sample & Hold (simulated with square and step)
-                            setTimeout(() => lfo.frequency.setValueAtTime(document.getElementById('lfoRate').value, ctx.currentTime + 0.01), 0);
-                            break;
-                    case 3: lfo.type = 'square'; lfo.frequency.setValueAtTime(0, ctx.currentTime); // Random (simulated with noise-like steps)
-                            setTimeout(() => {
-                                lfo.frequency.setValueAtTime(document.getElementById('lfoRate').value, ctx.currentTime + 0.01);
-                                lfoAmpGain.gain.setValueAtTime(Math.random() * 2, ctx.currentTime + 0.01);
-                            }, 0);
-                            break;
-                }
-                document.getElementById('lfoShapeValue').textContent = ['Sine', 'Square', 'Sample & Hold'][lfoShape];
-
                 if (isMidiActive) sendMidiMessage();
             }
 
@@ -571,16 +569,28 @@
                 requestAnimationFrame(smoothTransition);
             }
 
-            function toggleRandomize() { isRandomizing = !isRandomizing;
-                const interval = parseFloat(document.getElementById('randomInterval').value);
-                document.getElementById('randomizeToggle').textContent = isRandomizing ? `Stop ${isGradualMode ? 'Gradual' : 'Random'} Every ${interval < 1 ? (interval * 1000).toFixed(0) + 'ms' : interval.toFixed(1) + 's'}` : `${isGradualMode ? 'Gradual' : 'Random'} Every ${interval < 1 ? (interval * 1000).toFixed(0) + 'ms' : interval.toFixed(1) + 's'}`;
-                if (isRandomizing) {
-                    setTargetParams();
-                    smoothTransition();
-                } else {
-                    transitionProgress = 0;
-                }
-            }
+      function toggleRandomize() { 
+    isRandomizing = !isRandomizing;
+    const interval = parseFloat(document.getElementById('randomInterval').value);
+    if (isRandomizing) {
+        setTargetParams();
+        smoothTransition();
+    } else {
+        transitionProgress = 0;
+        document.getElementById('freq').value = targetParams.freq;
+        document.getElementById('modDepth').value = targetParams.modDepth;
+        document.getElementById('lfoRate').value = targetParams.lfoRate;
+        document.getElementById('lfoAmp').value = targetParams.lfoAmp;
+        document.getElementById('filterCutoff').value = targetParams.filterCutoff;
+        document.getElementById('distortion').value = targetParams.distortion;
+        if (isReverbRandomized) {
+            document.getElementById('reverbFeedback').value = targetParams.reverbFeedback;
+            document.getElementById('reverbSize').value = targetParams.reverbSize;
+        }
+        updateParams();
+    }
+    document.getElementById('randomizeToggle').textContent = isRandomizing ? `Stop ${isGradualMode ? 'Gradual' : 'Random'} Every ${interval < 1 ? (interval * 1000).toFixed(0) + 'ms' : interval.toFixed(1) + 's'}` : `${isGradualMode ? 'Gradual' : 'Random'} Every ${interval < 1 ? (interval * 1000).toFixed(0) + 'ms' : interval.toFixed(1) + 's'}`;
+}
 
             function toggleMode() { isGradualMode = !isGradualMode; attractorState1 = { x: 0.1, y: 0.1, z: 0.1 }; attractorState2 = { x: 1.0, y: 1.0, z: 1.0 };
                 const interval = parseFloat(document.getElementById('randomInterval').value);
@@ -733,7 +743,6 @@
             document.getElementById('lfoAmp').addEventListener('input', updateParams);
             document.getElementById('filterCutoff').addEventListener('input', updateParams);
             document.getElementById('distortion').addEventListener('input', updateParams);
-            document.getElementById('lfoShape').addEventListener('input', updateParams);
 
             document.getElementById('helpButton').addEventListener('click', () => document.getElementById('helpPopup').classList.add('show'));
             document.getElementById('closeHelp').addEventListener('click', () => document.getElementById('helpPopup').classList.remove('show'));
