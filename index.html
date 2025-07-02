@@ -197,17 +197,30 @@
                 <div class="help-button" id="helpButton">?</div>
             </div>
         </div>
+        <div class="space-y-4 mt-6">
+    <h2 class="glitch-button bold-button bold-button-flicker">Playback Controls</h2>
+    <div class="slider-container tooltip" data-tooltip="Set recording duration (1-4 seconds)">
+        <label class="block text-base font-bold">Record Duration: <span id="recordDurationValue">1</span>s</label>
+        <input type="range" id="recordDuration" min="1" max="4" step="0.1" value="1" class="w-full">
+    </div>
+    <div class="flex justify-center gap-4">
+        <button id="playToggle" class="glitch-button bold-button bold-button-flicker rounded-full w-12 h-12 flex items-center justify-center">▶</button>
+        <button id="recordTogglePlayback" class="glitch-button bold-button bold-button-flicker rounded-full w-12 h-12 flex items-center justify-center">●</button>
+        <button id="stopToggle" class="glitch-button bold-button bold-button-flicker">■</button>
+    </div>
+</div>
         <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             <button id="oscToggle" class="glitch-button bold-button bold-button-flicker">Start Osc</button>
             <button id="lfoToggle" class="glitch-button bold-button bold-button-flicker">Start LFO</button>
-            <button id="sensorToggle" class="glitch-button">Enable Sensors</button>
-            <button id="calibrateToggle" class="glitch-button">Calibrate Sensors</button>
-            <button id="freezeToggle" class="glitch-button bold-button bold-button-flicker">Freeze Effect</button>
-            <button id="freezeModeToggle" class="glitch-button">Freeze: Shake Mode</button>
-            <button id="freezeSensorToggle" class="glitch-button">Enable Freeze Sensor</button>
-            <button id="randomizeToggle" class="glitch-button bold-button bold-button-flicker">Randomize Every <span id="randomToggleText">50ms</span></button>
-            <button id="reverbToggle" class="glitch-button">Enable Reverb</button>
+             <button id="randomizeToggle" class="glitch-button bold-button bold-button-flicker">Randomize Every <span id="randomToggleText">50ms</span></button>
+                  <button id="freezeToggle" class="glitch-button bold-button bold-button-flicker">Freeze Effect</button>
+                      <button id="reverbToggle" class="glitch-button">Enable Reverb</button>
             <button id="reverbRandomToggle" class="glitch-button">Include Reverb in Random</button>
+            <button id="sensorToggle" class="glitch-button">Enable Sensors</button>
+              <button id="freezeSensorToggle" class="glitch-button">Enable Freeze Sensor</button>
+               <button id="freezeModeToggle" class="glitch-button">Freeze: Shake Mode</button>
+            <button id="calibrateToggle" class="glitch-button">Calibrate Sensors</button>
+  
             <button id="recordToggle" class="glitch-button bold-button bold-button-flicker">Start Recording</button>
             <button id="midiToggle" class="glitch-button">Disable MIDI</button>
             <div class="mt-4 flex justify-center gap-4">
@@ -321,6 +334,9 @@
     let midiOutput = null, midiChannel = 0, isMidiActive = true, lastMidiSendTime = 0;
     let isGradualMode = false, attractorState1 = { x: 0.1, y: 0.1, z: 0.1 }, attractorState2 = { x: 1.0, y: 1.0, z: 1.0 }, lastAttractorUpdate = 0;
     let randomizeInterval, transitionProgress = 0, transitionDuration = 0, targetParams = {};
+    let isPlayingBack = false, isRecordingPlayback = false, playbackBuffer = [], playbackIndex = 0, playbackStartTime = 0;
+let recordedParams = ['freq', 'modDepth', 'lfoRate', 'lfoAmp', 'filterCutoff', 'distortion', 'reverbFeedback', 'reverbSize'];
+    
     // Store manual slider values when checkboxes are deselected
     let manualValues = {
         freq: 440,
@@ -330,6 +346,112 @@
         reverbFeedback: 0.5,
         reverbSize: 2
     };
+
+
+function updatePlaybackParams() {
+    if (isPlayingBack && playbackBuffer.length > 0) {
+        const now = performance.now();
+        const elapsed = (now - playbackStartTime) / 1000;
+        const duration = parseFloat(document.getElementById('recordDuration').value);
+        if (elapsed >= duration) {
+            playbackIndex = 0;
+            playbackStartTime = now;
+        }
+        const t = (elapsed % duration) / duration * playbackBuffer.length;
+        const i = Math.floor(t);
+        const nextI = (i + 1) % playbackBuffer.length;
+        const progress = t - i;
+        recordedParams.forEach(param => {
+            const startValue = playbackBuffer[i][param];
+            const endValue = playbackBuffer[nextI][param];
+            const interpolatedValue = interpolateValue(startValue, endValue, progress).toFixed(2);
+            document.getElementById(param).value = interpolatedValue;
+            // Update UI labels
+            switch (param) {
+                case 'reverbSize':
+                    document.getElementById('reverbSizeValue').textContent = interpolatedValue;
+                    break;
+                case 'reverbFeedback':
+                    document.getElementById('reverbFeedbackValue').textContent = interpolatedValue;
+                    break;
+                case 'randomInterval':
+                    document.getElementById('randomIntervalValue').textContent = interpolatedValue < 1 ? (interpolatedValue * 1000).toFixed(0) + 'ms' : interpolatedValue.toFixed(1) + 's';
+                    break;
+            }
+        });
+        updateParams();
+        requestAnimationFrame(updatePlaybackParams);
+    }
+}
+
+document.getElementById('recordDuration').addEventListener('input', () => {
+    const duration = parseFloat(document.getElementById('recordDuration').value);
+    document.getElementById('recordDurationValue').textContent = duration.toFixed(1);
+});
+
+document.getElementById('playToggle').addEventListener('click', () => {
+    if (!isPlayingBack && !isRecordingPlayback && playbackBuffer.length > 0) {
+        console.log('Starting playback with buffer length:', playbackBuffer.length);
+        isPlayingBack = true;
+        playbackIndex = 0;
+        playbackStartTime = performance.now();
+        updatePlaybackParams();
+    }
+});
+
+document.getElementById('recordTogglePlayback').addEventListener('click', () => {
+    if (!isRecordingPlayback) {
+        console.log('Starting recording playback');
+        isRecordingPlayback = true;
+        playbackBuffer = [];
+        const startTime = performance.now();
+        const duration = parseFloat(document.getElementById('recordDuration').value) * 1000;
+        const interval = setInterval(() => {
+            if (isRecordingPlayback) {
+                const elapsed = performance.now() - startTime;
+                if (elapsed <= duration) {
+                    const snapshot = {};
+                    recordedParams.forEach(param => {
+                        snapshot[param] = parseFloat(document.getElementById(param).value);
+                    });
+                    playbackBuffer.push(snapshot);
+                    console.log('Recorded snapshot:', snapshot);
+                } else {
+                    clearInterval(interval);
+                    isRecordingPlayback = false;
+                    console.log('Recording complete, buffer length:', playbackBuffer.length);
+                }
+            } else {
+                clearInterval(interval);
+            }
+        }, 50); // Record every 50ms
+    }
+});
+
+document.getElementById('stopToggle').addEventListener('click', () => {
+    isPlayingBack = false;
+    isRecordingPlayback = false;
+    playbackIndex = 0;
+    if (!isRandomizing) {
+        recordedParams.forEach(param => {
+            document.getElementById(param).value = manualValues[param];
+            // Update UI labels
+            switch (param) {
+                case 'reverbSize':
+                    document.getElementById('reverbSizeValue').textContent = manualValues[param];
+                    break;
+                case 'reverbFeedback':
+                    document.getElementById('reverbFeedbackValue').textContent = manualValues[param];
+                    break;
+                case 'randomInterval':
+                    document.getElementById('randomIntervalValue').textContent = manualValues[param] < 1 ? (manualValues[param] * 1000).toFixed(0) + 'ms' : manualValues[param].toFixed(1) + 's';
+                    break;
+            }
+        });
+        updateParams();
+    }
+    console.log('Stopped playback/recording');
+});
 
     function initAudio() {
         osc = ctx.createOscillator(); osc.type = 'sine'; osc.frequency.setValueAtTime(440, ctx.currentTime);
