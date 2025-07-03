@@ -76,7 +76,7 @@
             text-shadow: 0 0 8px #ff0066;
         }
         .help-button {
-            position: absolute; top: 705px; right: 370px;
+            position: absolute; top: 975px; right: 370px;
             background: #000; border: 2px solid #ff0066;
             border-radius: 50%; width: 30px; height: 30px;
             display: flex; align-items: center; justify-content: center;
@@ -131,10 +131,7 @@
         </filter>
     </svg>
     <canvas id="visuals" class="w-full h-full"></canvas>
-    <div class="logo">
-        <img src="fate192.png" alt="Fate Logo">
-    </div>
-   <br> <br> <br> <br>
+
     <h2 class="glitch-button bold-button bold-button-flicker">Blowback</h2><br>
     <div class="control-panel w-full max-w-4xl">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
@@ -329,7 +326,12 @@
             <li><strong>MIDI Channel:</strong> Choose the MIDI channel (1-16).</li>
             <li><strong>Modulation Matrix:</strong> Select which parameters send MIDI CC (18-25).</li></ul>
         <p><strong>Notes:</strong> Requires HTTPS for sensors and modern browsers for MIDI/recording. Use MIDI CC 18-25 for parameter control. Freeze feature uses offline rendering to capture audio state, including reverb.</p>
+      <p><strong>info, comments, more goodies...</strong></p>
+        <ul> <a href="https://ihearcolors.online">ihearcolors.online</a>  </li>
+            <li><strong>mail:</strong>ihearcolorsonline@gmail.com</li>
     </div>
+    <BR>
+ <a href="https://ihearcolors.online">ihearcolors.online</a> 
     <script>
       document.addEventListener('DOMContentLoaded', () => {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
