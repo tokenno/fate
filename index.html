@@ -143,14 +143,17 @@
                 <div class="slider-container tooltip" data-tooltip="Base frequency (20-4000 Hz)">
                     <label class="block text-base font-bold">Frequency</label>
                     <input type="range" id="freq" min="20" max="4000" value="440" class="w-full">
+                       <label class="random-override-label"><input type="checkbox" id="freqRandom" checked> Frequency Random</label>
                 </div>
                 <div class="slider-container tooltip" data-tooltip="Modulation depth (0-2000 Hz)">
                     <label class="block text-base font-bold">Mod Depth</label>
                     <input type="range" id="modDepth" min="0" max="2000" step="1" value="500" class="w-full">
+                      <label class="random-override-label"><input type="checkbox" id="modDepthRandom" checked> Mod Depth Random</label>
                 </div>
                 <div class="slider-container tooltip" data-tooltip="Low-pass filter cutoff (60-20000 Hz)">
                     <label class="block text-base font-bold">Filter Cutoff</label>
                     <input type="range" id="filterCutoff" min="60" max="20000" value="1000" class="w-full">
+                      <label class="random-override-label"><input type="checkbox" id="filterCutoffRandom" checked> Filter Cutoff Random</label>
                 </div>
                 <div class="slider-container tooltip" data-tooltip="Randomization interval (20ms-5s)">
                     <label class="block text-base font-bold">Random Interval: <span id="randomIntervalValue">50ms</span></label>
@@ -162,11 +165,14 @@
                 <div class="slider-container tooltip" data-tooltip="LFO rate (0-50 Hz)">
                     <label class="block text-base font-bold">LFO Rate</label>
                     <input type="range" id="lfoRate" min="0" max="50" value="5" class="w-full">
+                        <label class="random-override-label"><input type="checkbox" id="lfoRateRandom" checked> LFO Rate Random</label>
                 </div>
-                <div class="slider-container tooltip" data-tooltip="LFO amplitude (0-2)">
-                    <label class="block text-base font-bold">LFO Amp</label>
-                    <input type="range" id="lfoAmp" min="0" max="2" step="0.01" value="0.5" class="w-full">
-                </div>
+               <div class="slider-container tooltip" data-tooltip="LFO amplitude (0-2)">
+        <label class="block text-base font-bold">LFO Amp</label>
+        <input type="range" id="lfoAmp" min="0" max="2" step="0.01" value="0.5" class="w-full">
+        <label class="random-override-label"><input type="checkbox" id="lfoAmpRandom" checked> LFO Amp Random</label>
+    </div>
+
                 <div class="slider-container tooltip" data-tooltip="Sensor sensitivity (0.5x-2x)">
                     <label class="block text-base font-bold">Sensor Sensitivity: <span id="sensorSensitivityValue">1</span>x</label>
                     <input type="range" id="sensorSensitivity" min="0.5" max="2" step="0.1" value="1" class="w-full">
@@ -178,18 +184,21 @@
             </div>
             <div class="space-y-4 relative">
                 <h2 class="glitch-button bold-button bold-button-flicker">Effects</h2>
-                <div class="slider-container tooltip" data-tooltip="Distortion amount (0-2)">
-                    <label class="block text-base font-bold">Distortion</label>
-                    <input type="range" id="distortion" min="0" max="2" step="0.01" value="0.2" class="w-full">
-                </div>
+               <div class="slider-container tooltip" data-tooltip="Distortion amount (0-2)">
+        <label class="block text-base font-bold">Distortion</label>
+        <input type="range" id="distortion" min="0" max="2" step="0.01" value="0.2" class="w-full">
+        <label class="random-override-label"><input type="checkbox" id="distortionRandom" checked> Distortion Random</label>
+    </div>
                 <div class="slider-container tooltip" data-tooltip="Reverb size (0.5-5s)">
-                    <label class="block text-base font-bold">Reverb Size: <span id="reverbSizeValue">2</span>s</label>
-                    <input type="range" id="reverbSize" min="0.5" max="5" step="0.1" value="2" class="w-full">
-                </div>
-                <div class="slider-container tooltip" data-tooltip="Reverb feedback (0-0.95)">
-                    <label class="block text-base font-bold">Reverb Feedback: <span id="reverbFeedbackValue">0.5</span></label>
-                    <input type="range" id="reverbFeedback" min="0" max="0.95" step="0.01" value="0.5" class="w-full">
-                </div>
+        <label class="block text-base font-bold">Reverb Size: <span id="reverbSizeValue">2</span>s</label>
+        <input type="range" id="reverbSize" min="0.5" max="5" step="0.1" value="2" class="w-full">
+        <label class="random-override-label"><input type="checkbox" id="reverbSizeRandom" checked> Reverb Size Random</label>
+    </div>
+    <div class="slider-container tooltip" data-tooltip="Reverb feedback (0-0.95)">
+        <label class="block text-base font-bold">Reverb Feedback: <span id="reverbFeedbackValue">0.5</span></label>
+        <input type="range" id="reverbFeedback" min="0" max="0.95" step="0.01" value="0.5" class="w-full">
+        <label class="random-override-label"><input type="checkbox" id="reverbFeedbackRandom" checked> Reverb Feedback Random</label>
+    </div>
                 <div class="slider-container tooltip" data-tooltip="Freeze trigger threshold (0-20 m/s²)">
                     <label class="block text-base font-bold">Freeze Threshold: <span id="freezeThresholdValue">18</span> m/s²</label>
                     <input type="range" id="freezeThreshold" min="0" max="20" step="0.1" value="18" class="w-full">
@@ -255,10 +264,7 @@
                 </select>
             </div>
        <div id="modMatrix" class="mt-4 grid grid-cols-2 gap-2">
-    <label class="random-override-label"><input type="checkbox" id="freqRandom" checked> Frequency Random</label>
-    <label class="random-override-label"><input type="checkbox" id="lfoRateRandom" checked> LFO Rate Random</label>
-    <label class="random-override-label"><input type="checkbox" id="filterCutoffRandom" checked> Filter Cutoff Random</label>
-    <label class="random-override-label"><input type="checkbox" id="modDepthRandom" checked> Mod Depth Random</label>
+  
     <label class="midi-override-label"><input type="checkbox" id="freqMidi" checked> Frequency (CC 18)</label>
     <label class="midi-override-label"><input type="checkbox" id="modDepthMidi" checked> Mod Depth (CC 19)</label>
     <label class="midi-override-label"><input type="checkbox" id="filterCutoffMidi" checked> Filter Cutoff (CC 20)</label>
@@ -335,16 +341,18 @@
     let isGradualMode = false, attractorState1 = { x: 0.1, y: 0.1, z: 0.1 }, attractorState2 = { x: 1.0, y: 1.0, z: 1.0 }, lastAttractorUpdate = 0;
     let randomizeInterval, transitionProgress = 0, transitionDuration = 0, targetParams = {};
     let isPlayingBack = false, isRecordingPlayback = false, playbackBuffer = [], playbackIndex = 0, playbackStartTime = 0;
-let recordedParams = ['freq', 'modDepth', 'lfoRate', 'lfoAmp', 'filterCutoff', 'distortion', 'reverbFeedback', 'reverbSize'];
+   let recordedParams = ['freq', 'modDepth', 'lfoRate', 'lfoAmp', 'filterCutoff', 'distortion', 'reverbFeedback', 'reverbSize'];
     
     // Store manual slider values when checkboxes are deselected
-    let manualValues = {
+     let manualValues = {
         freq: 440,
         modDepth: 500,
         lfoRate: 5,
         filterCutoff: 1000,
         reverbFeedback: 0.5,
-        reverbSize: 2
+        reverbSize: 2,
+        lfoAmp: 0.5,
+        distortion: 0.2
     };
 
 
@@ -631,19 +639,19 @@ document.getElementById('stopToggle').addEventListener('click', () => {
         return start + (end - start) * mu;
     }
 
-    function setTargetParams() {
+  function setTargetParams() {
         const attractorType = document.getElementById('attractorSelect').value;
         updateAttractor(attractorType);
         if (isGradualMode) {
             targetParams.freq = document.getElementById('freqRandom').checked ? Math.max(20, Math.min(4000, manualValues.freq + ((attractorState1.x + 15) / 30 * 3980 - 2000) * 0.5)) : manualValues.freq;
             targetParams.modDepth = document.getElementById('modDepthRandom').checked ? Math.max(0, Math.min(2000, manualValues.modDepth + ((attractorState1.y + 15) / 30 * 2000 * 0.7 - 700) * 0.5)) : manualValues.modDepth;
             targetParams.lfoRate = document.getElementById('lfoRateRandom').checked ? Math.max(0, Math.min(50, manualValues.lfoRate + ((attractorState1.z + 15) / 30 * 50 * 0.4 - 10) * 0.5)) : manualValues.lfoRate;
-            targetParams.lfoAmp = Math.max(0, Math.min(2, ((Math.sin(attractorState1.x) + 1) / 2 * 2)));
+            targetParams.lfoAmp = document.getElementById('lfoAmpRandom').checked ? Math.max(0, Math.min(2, manualValues.lfoAmp + ((Math.sin(attractorState1.x) + 1) / 2 * 2))) : manualValues.lfoAmp;
             targetParams.filterCutoff = document.getElementById('filterCutoffRandom').checked ? Math.max(60, Math.min(20000, manualValues.filterCutoff + ((attractorState2.y + 15) / 30 * 19980 - 10000) * 0.5)) : manualValues.filterCutoff;
-            targetParams.distortion = Math.max(0, Math.min(2, (Math.abs(attractorState1.z) + 15) / 30 * 2 * 0.5));
+            targetParams.distortion = document.getElementById('distortionRandom').checked ? Math.max(0, Math.min(2, manualValues.distortion + ((Math.abs(attractorState1.z) + 15) / 30 * 2 * 0.5))) : manualValues.distortion;
             if (isReverbRandomized) {
-                targetParams.reverbFeedback = Math.max(0, Math.min(0.95, manualValues.reverbFeedback + (((Math.cos(attractorState1.x) + 1) / 2 * 0.95) - 0.475) * 0.5));
-                targetParams.reverbSize = Math.max(0.5, Math.min(5, manualValues.reverbSize + (((Math.sin(attractorState1.y) + 1) / 2 * 4.5 + 0.5) - 2.75) * 0.5));
+                targetParams.reverbFeedback = document.getElementById('reverbFeedbackRandom').checked ? Math.max(0, Math.min(0.95, manualValues.reverbFeedback + (((Math.cos(attractorState1.x) + 1) / 2 * 0.95) - 0.475) * 0.5)) : manualValues.reverbFeedback;
+                targetParams.reverbSize = document.getElementById('reverbSizeRandom').checked ? Math.max(0.5, Math.min(5, manualValues.reverbSize + (((Math.sin(attractorState1.y) + 1) / 2 * 4.5 + 0.5) - 2.75) * 0.5)) : manualValues.reverbSize;
             } else {
                 targetParams.reverbFeedback = manualValues.reverbFeedback;
                 targetParams.reverbSize = manualValues.reverbSize;
@@ -652,12 +660,12 @@ document.getElementById('stopToggle').addEventListener('click', () => {
             targetParams.freq = document.getElementById('freqRandom').checked && Math.random() > 0.5 ? Math.max(20, Math.min(4000, manualValues.freq + (Math.random() * 200 - 100))) : manualValues.freq;
             targetParams.modDepth = document.getElementById('modDepthRandom').checked && Math.random() > 0.5 ? Math.max(0, Math.min(2000, manualValues.modDepth + (Math.random() * 200 - 100) * 0.7)) : manualValues.modDepth;
             targetParams.lfoRate = document.getElementById('lfoRateRandom').checked && Math.random() > 0.5 ? Math.max(0, Math.min(50, manualValues.lfoRate + (Math.random() * 5 - 2.5) * 0.4)) : manualValues.lfoRate;
-            targetParams.lfoAmp = Math.max(0, Math.min(2, manualValues.lfoAmp + (Math.random() * 0.2 - 0.1)));
+            targetParams.lfoAmp = document.getElementById('lfoAmpRandom').checked && Math.random() > 0.5 ? Math.max(0, Math.min(2, manualValues.lfoAmp + (Math.random() * 0.2 - 0.1))) : manualValues.lfoAmp;
             targetParams.filterCutoff = document.getElementById('filterCutoffRandom').checked && Math.random() > 0.5 ? Math.max(60, Math.min(20000, manualValues.filterCutoff + (Math.random() * 1000 - 500) * 1.2)) : manualValues.filterCutoff;
-            targetParams.distortion = Math.max(0, Math.min(2, manualValues.distortion + (Math.random() * 0.2 - 0.1) * 0.5));
+            targetParams.distortion = document.getElementById('distortionRandom').checked && Math.random() > 0.5 ? Math.max(0, Math.min(2, manualValues.distortion + (Math.random() * 0.2 - 0.1) * 0.5)) : manualValues.distortion;
             if (isReverbRandomized) {
-                targetParams.reverbFeedback = Math.max(0, Math.min(0.95, manualValues.reverbFeedback + (Math.random() * 0.1 - 0.05)));
-                targetParams.reverbSize = Math.max(0.5, Math.min(5, manualValues.reverbSize + (Math.random() * 0.5 - 0.25)));
+                targetParams.reverbFeedback = document.getElementById('reverbFeedbackRandom').checked && Math.random() > 0.5 ? Math.max(0, Math.min(0.95, manualValues.reverbFeedback + (Math.random() * 0.1 - 0.05))) : manualValues.reverbFeedback;
+                targetParams.reverbSize = document.getElementById('reverbSizeRandom').checked && Math.random() > 0.5 ? Math.max(0.5, Math.min(5, manualValues.reverbSize + (Math.random() * 0.5 - 0.25))) : manualValues.reverbSize;
             } else {
                 targetParams.reverbFeedback = manualValues.reverbFeedback;
                 targetParams.reverbSize = manualValues.reverbSize;
@@ -667,7 +675,7 @@ document.getElementById('stopToggle').addEventListener('click', () => {
         transitionDuration = parseFloat(document.getElementById('randomInterval').value) * 1000;
     }
 
-    function updateParams() {
+   function updateParams() {
         osc.frequency.setValueAtTime(document.getElementById('freq').value, ctx.currentTime);
         modGain.gain.setValueAtTime(document.getElementById('modDepth').value, ctx.currentTime);
         lfo.frequency.setValueAtTime(document.getElementById('lfoRate').value, ctx.currentTime);
@@ -706,7 +714,6 @@ document.getElementById('stopToggle').addEventListener('click', () => {
         manualValues.reverbFeedback = parseFloat(document.getElementById('reverbFeedback').value);
         manualValues.reverbSize = parseFloat(document.getElementById('reverbSize').value);
     }
-
     function smoothTransition() {
         if (!isRandomizing) {
             transitionProgress = 0;
@@ -729,14 +736,22 @@ document.getElementById('stopToggle').addEventListener('click', () => {
         if (document.getElementById('lfoRateRandom').checked) {
             document.getElementById('lfoRate').value = interpolateValue(parseFloat(document.getElementById('lfoRate').value), targetParams.lfoRate, Math.min(transitionProgress, 1)).toFixed(2);
         }
-        document.getElementById('lfoAmp').value = interpolateValue(parseFloat(document.getElementById('lfoAmp').value), targetParams.lfoAmp, Math.min(transitionProgress, 1)).toFixed(2);
+        if (document.getElementById('lfoAmpRandom').checked) {
+            document.getElementById('lfoAmp').value = interpolateValue(parseFloat(document.getElementById('lfoAmp').value), targetParams.lfoAmp, Math.min(transitionProgress, 1)).toFixed(2);
+        }
         if (document.getElementById('filterCutoffRandom').checked) {
             document.getElementById('filterCutoff').value = interpolateValue(parseFloat(document.getElementById('filterCutoff').value), targetParams.filterCutoff, Math.min(transitionProgress, 1)).toFixed(2);
         }
-        document.getElementById('distortion').value = interpolateValue(parseFloat(document.getElementById('distortion').value), targetParams.distortion, Math.min(transitionProgress, 1)).toFixed(2);
+        if (document.getElementById('distortionRandom').checked) {
+            document.getElementById('distortion').value = interpolateValue(parseFloat(document.getElementById('distortion').value), targetParams.distortion, Math.min(transitionProgress, 1)).toFixed(2);
+        }
         if (isReverbRandomized) {
-            document.getElementById('reverbFeedback').value = interpolateValue(parseFloat(document.getElementById('reverbFeedback').value), targetParams.reverbFeedback, Math.min(transitionProgress, 1)).toFixed(2);
-            document.getElementById('reverbSize').value = interpolateValue(parseFloat(document.getElementById('reverbSize').value), targetParams.reverbSize, Math.min(transitionProgress, 1)).toFixed(2);
+            if (document.getElementById('reverbFeedbackRandom').checked) {
+                document.getElementById('reverbFeedback').value = interpolateValue(parseFloat(document.getElementById('reverbFeedback').value), targetParams.reverbFeedback, Math.min(transitionProgress, 1)).toFixed(2);
+            }
+            if (document.getElementById('reverbSizeRandom').checked) {
+                document.getElementById('reverbSize').value = interpolateValue(parseFloat(document.getElementById('reverbSize').value), targetParams.reverbSize, Math.min(transitionProgress, 1)).toFixed(2);
+            }
         }
 
         updateParams();
@@ -976,6 +991,50 @@ document.getElementById('stopToggle').addEventListener('click', () => {
         if (!e.target.checked && isRandomizing) {
             manualValues.lfoRate = parseFloat(document.getElementById('lfoRate').value);
             document.getElementById('lfoRate').value = manualValues.lfoRate;
+            updateParams();
+        } else if (e.target.checked && isRandomizing) {
+            setTargetParams();
+            smoothTransition();
+        }
+    });
+
+       document.getElementById('lfoAmpRandom').addEventListener('change', (e) => {
+        if (!e.target.checked && isRandomizing) {
+            manualValues.lfoAmp = parseFloat(document.getElementById('lfoAmp').value);
+            document.getElementById('lfoAmp').value = manualValues.lfoAmp;
+            updateParams();
+        } else if (e.target.checked && isRandomizing) {
+            setTargetParams();
+            smoothTransition();
+        }
+    });
+
+    document.getElementById('distortionRandom').addEventListener('change', (e) => {
+        if (!e.target.checked && isRandomizing) {
+            manualValues.distortion = parseFloat(document.getElementById('distortion').value);
+            document.getElementById('distortion').value = manualValues.distortion;
+            updateParams();
+        } else if (e.target.checked && isRandomizing) {
+            setTargetParams();
+            smoothTransition();
+        }
+    });
+
+    document.getElementById('reverbSizeRandom').addEventListener('change', (e) => {
+        if (!e.target.checked && isRandomizing) {
+            manualValues.reverbSize = parseFloat(document.getElementById('reverbSize').value);
+            document.getElementById('reverbSize').value = manualValues.reverbSize;
+            updateParams();
+        } else if (e.target.checked && isRandomizing) {
+            setTargetParams();
+            smoothTransition();
+        }
+    });
+
+    document.getElementById('reverbFeedbackRandom').addEventListener('change', (e) => {
+        if (!e.target.checked && isRandomizing) {
+            manualValues.reverbFeedback = parseFloat(document.getElementById('reverbFeedback').value);
+            document.getElementById('reverbFeedback').value = manualValues.reverbFeedback;
             updateParams();
         } else if (e.target.checked && isRandomizing) {
             setTargetParams();
