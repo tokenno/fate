@@ -907,7 +907,7 @@ function animateCanvas(timestamp) {
         // Spin logo based on lfoRate when random mode is on
        if (isRandomizing) {
     const lfoRate = parseFloat(document.getElementById('lfoRate').value) || 0;
-    logoAngle += lfoRate * 0.001;
+    logoAngle += lfoRate * 0.010;
     logo.style.transform = `rotate(${logoAngle}deg)`;
         } else {
             logo.style.transform = 'rotate(0deg)';
